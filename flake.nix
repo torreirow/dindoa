@@ -1,7 +1,7 @@
 {
   description = "Dindoa - Generate ICS calendar files for Dindoa korfbal team matches";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-24.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = { self, nixpkgs }:
     let
