@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT VERSION
+## 0.1.0 - 13 Apr 2026
 
 ### Added
 - **Initial release**: CLI tool to generate ICS calendar files for Dindoa korfbal team matches
