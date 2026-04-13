@@ -7,6 +7,9 @@
   - Added pre-built binaries installation instructions for all platforms
   - Extensive NixOS/Nix documentation (standalone, NixOS config, Home Manager)
   - Better organization with markdown collapsible blocks
+  - Added shields.io badges (version, downloads, license, Go version)
+  - Use GitHub's /releases/latest URL for automatic version linking
+  - Added GitHub CLI download example
 
 ### Added
 - **Release automation**: Script now auto-generates NEXT VERSION placeholder after releases
