@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT VERSION
+## 0.1.2 - 13 Apr 2026
 
 ### Fixed
 - **Nix build compatibility**: Updated flake.nix to use nixpkgs-unstable for Go 1.25.7 support
