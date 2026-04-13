@@ -1,6 +1,9 @@
 # Changelog
 
+
 ## NEXT VERSION
+
+## 0.1.3 - 13 Apr 2026
 
 ### Changed
 - **Documentation**: Comprehensive README update with collapsible sections
