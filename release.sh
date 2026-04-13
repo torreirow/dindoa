@@ -244,6 +244,19 @@ else
     print_success "Updated CHANGELOG.md with new entries"
 fi
 
+# Add new "## NEXT VERSION" section for future releases
+print_info "Adding new NEXT VERSION section to CHANGELOG.md..."
+TEMP_FILE=$(mktemp)
+{
+    head -n 2 CHANGELOG.md
+    echo ""
+    echo "## NEXT VERSION"
+    echo ""
+    tail -n +3 CHANGELOG.md
+} > "$TEMP_FILE"
+mv "$TEMP_FILE" CHANGELOG.md
+print_success "Added NEXT VERSION placeholder for next release"
+
 # Update VERSION
 print_info "Updating VERSION..."
 echo "$NEW_VERSION" > VERSION
