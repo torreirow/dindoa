@@ -1,5 +1,13 @@
 # Changelog
 
+## NEXT VERSION
+
+### Added
+- **Nix packaging**: Added flake.nix for Nix package manager support
+  - Automatic vendorHash calculation in release.sh when Go dependencies change
+  - Development shell with Go tooling
+  - Multi-platform builds via buildGoModule
+
 ## 0.1.0 - 13 Apr 2026
 
 ### Added
