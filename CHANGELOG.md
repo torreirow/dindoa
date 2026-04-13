@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT VERSION
+
+### Fixed
+- **Nix build compatibility**: Updated flake.nix to use nixpkgs-unstable for Go 1.25.7 support
+- **GitHub Actions**: Updated workflow to use Go 1.25.7 to match go.mod requirements
+
 ## 0.1.1 - 13 Apr 2026
 
 ### Added
