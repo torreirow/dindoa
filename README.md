@@ -1,5 +1,10 @@
 # Dindoa ICS Generator
 
+[![Latest Release](https://img.shields.io/github/v/release/torreirow/dindoa)](https://github.com/torreirow/dindoa/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/torreirow/dindoa/total)](https://github.com/torreirow/dindoa/releases)
+[![License](https://img.shields.io/github/license/torreirow/dindoa)](LICENSE)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/torreirow/dindoa)](go.mod)
+
 Een CLI tool om wedstrijdschema's van Dindoa korfbal teams te exporteren naar ICS kalender bestanden.
 
 ## Features
@@ -23,17 +28,20 @@ Download de nieuwste release voor jouw platform:
 - macOS (amd64, arm64)
 - Windows (amd64, arm64)
 
-```bash
-# Ga naar releases pagina
-https://github.com/torreirow/dindoa/releases/latest
+**📥 [Download nieuwste release](https://github.com/torreirow/dindoa/releases/latest)**
 
-# Download en extract voor je platform
-# Linux amd64 voorbeeld:
-wget https://github.com/torreirow/dindoa/releases/download/v0.1.1/dindoa-0.1.1-linux-amd64.tar.gz
-tar xzf dindoa-0.1.1-linux-amd64.tar.gz
+```bash
+# Linux amd64 voorbeeld (vervang VERSION met de nieuwste release):
+wget https://github.com/torreirow/dindoa/releases/latest/download/dindoa-VERSION-linux-amd64.tar.gz
+tar xzf dindoa-VERSION-linux-amd64.tar.gz
 sudo mv dindoa /usr/local/bin/
 
-# Windows: download .zip en extract naar een directory in je PATH
+# Of via GitHub CLI:
+gh release download --repo torreirow/dindoa --pattern '*linux-amd64.tar.gz'
+tar xzf dindoa-*-linux-amd64.tar.gz
+sudo mv dindoa /usr/local/bin/
+
+# Windows: download .zip van releases pagina en extract naar een directory in je PATH
 ```
 
 </details>
@@ -44,11 +52,11 @@ sudo mv dindoa /usr/local/bin/
 ### Standalone gebruik (zonder installatie)
 
 ```bash
-# Direct runnen vanaf GitHub
+# Direct runnen vanaf GitHub (nieuwste versie)
 nix run github:torreirow/dindoa -- start
 
-# Met specifieke versie
-nix run github:torreirow/dindoa/v0.1.1 -- --team j3
+# Met specifieke versie/tag
+nix run github:torreirow/dindoa/v0.1.2 -- --team j3
 
 # Alle commando's werken
 nix run github:torreirow/dindoa -- --list-categories
@@ -111,11 +119,11 @@ Voeg dindoa toe aan je Home Manager configuratie:
 ### Nix profile (zonder flakes)
 
 ```bash
-# Installeer in je profiel
+# Installeer in je profiel (nieuwste versie)
 nix profile install github:torreirow/dindoa
 
-# Of met specifieke versie
-nix profile install github:torreirow/dindoa/v0.1.1
+# Of met specifieke versie/tag
+nix profile install github:torreirow/dindoa/v0.1.2
 ```
 
 ### Development shell
