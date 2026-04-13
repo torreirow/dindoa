@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT VERSION
+## 0.1.1 - 13 Apr 2026
 
 ### Added
 - **Nix packaging**: Added flake.nix for Nix package manager support
