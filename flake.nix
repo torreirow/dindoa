@@ -23,7 +23,7 @@
 
             # vendorHash is automatically updated by release.sh when Go dependencies change.
             # To manually update: Run `nix build .#dindoa 2>&1 | grep "got:"` and use the hash shown.
-            vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+            vendorHash = "sha256-KBINEvO1fD6C3LGozXzcDUyfueWvLDTgHig+Lsy46F8=";
 
             ldflags = [
               "-s"
