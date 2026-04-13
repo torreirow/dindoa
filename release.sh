@@ -273,9 +273,17 @@ if [[ -f flake.nix ]] && [[ -f go.mod ]]; then
     # Get last release tag
     LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
-    # Check if go.mod or go.sum changed
+    # Check if go.mod or go.sum changed, or if vendorHash is placeholder
     DEPS_CHANGED=false
-    if [[ -z "$LAST_TAG" ]]; then
+    HAS_PLACEHOLDER=false
+
+    # Check for placeholder vendorHash (all A's or all 0's)
+    if grep -q 'vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="' flake.nix || \
+       grep -q 'vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="' flake.nix; then
+        print_warning "Placeholder vendorHash detected - will calculate correct hash"
+        HAS_PLACEHOLDER=true
+        DEPS_CHANGED=true
+    elif [[ -z "$LAST_TAG" ]]; then
         print_info "No previous release tag found (first release)"
         DEPS_CHANGED=true
     elif git diff "${LAST_TAG}..HEAD" -- go.mod go.sum | grep -q .; then
