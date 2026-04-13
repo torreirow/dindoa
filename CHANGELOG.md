@@ -1,12 +1,6 @@
 # Changelog
 
-
 ## NEXT VERSION
-
-
-## 0.1.3 - 13 Apr 2026
-
-## 0.1.3 - 13 Apr 2026
 
 ### Changed
 - **Documentation**: Comprehensive README update with collapsible sections
@@ -19,6 +13,12 @@
 
 ### Added
 - **Release automation**: Script now auto-generates NEXT VERSION placeholder after releases
+- **Nix vendorHash detection**: Release script now detects placeholder hashes and calculates them automatically
+
+### Fixed
+- **Nix build compatibility**: Updated flake.nix to use nixpkgs-unstable for Go 1.25.7 support
+- **GitHub Actions**: Updated workflow to use Go 1.25.7 to match go.mod requirements
+- **Nix vendorHash**: Set correct hash for Go module dependencies
 
 ## 0.1.2 - 13 Apr 2026
 
