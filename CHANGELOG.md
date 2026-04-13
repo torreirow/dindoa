@@ -1,5 +1,16 @@
 # Changelog
 
+## NEXT VERSION
+
+### Changed
+- **Documentation**: Comprehensive README update with collapsible sections
+  - Added pre-built binaries installation instructions for all platforms
+  - Extensive NixOS/Nix documentation (standalone, NixOS config, Home Manager)
+  - Better organization with markdown collapsible blocks
+
+### Added
+- **Release automation**: Script now auto-generates NEXT VERSION placeholder after releases
+
 ## 0.1.2 - 13 Apr 2026
 
 ### Fixed
