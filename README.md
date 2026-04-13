@@ -13,7 +13,134 @@ Een CLI tool om wedstrijdschema's van Dindoa korfbal teams te exporteren naar IC
 
 ## Installatie
 
-### Vanaf bron
+<details>
+<summary><b>📦 Pre-built binaries (aanbevolen)</b></summary>
+
+Download de nieuwste release voor jouw platform:
+
+**Beschikbare platforms:**
+- Linux (amd64, arm64)
+- macOS (amd64, arm64)
+- Windows (amd64, arm64)
+
+```bash
+# Ga naar releases pagina
+https://github.com/torreirow/dindoa/releases/latest
+
+# Download en extract voor je platform
+# Linux amd64 voorbeeld:
+wget https://github.com/torreirow/dindoa/releases/download/v0.1.1/dindoa-0.1.1-linux-amd64.tar.gz
+tar xzf dindoa-0.1.1-linux-amd64.tar.gz
+sudo mv dindoa /usr/local/bin/
+
+# Windows: download .zip en extract naar een directory in je PATH
+```
+
+</details>
+
+<details>
+<summary><b>❄️ NixOS / Nix</b></summary>
+
+### Standalone gebruik (zonder installatie)
+
+```bash
+# Direct runnen vanaf GitHub
+nix run github:torreirow/dindoa -- start
+
+# Met specifieke versie
+nix run github:torreirow/dindoa/v0.1.1 -- --team j3
+
+# Alle commando's werken
+nix run github:torreirow/dindoa -- --list-categories
+nix run github:torreirow/dindoa -- --team j3 --output wedstrijden.ics
+```
+
+### NixOS configuratie
+
+Voeg dindoa toe als input in je `flake.nix`:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    dindoa.url = "github:torreirow/dindoa";
+  };
+
+  outputs = { self, nixpkgs, dindoa, ... }: {
+    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        {
+          environment.systemPackages = [
+            dindoa.packages.x86_64-linux.dindoa
+          ];
+        }
+      ];
+    };
+  };
+}
+```
+
+### Home Manager
+
+Voeg dindoa toe aan je Home Manager configuratie:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    dindoa.url = "github:torreirow/dindoa";
+  };
+
+  outputs = { self, nixpkgs, home-manager, dindoa, ... }: {
+    homeConfigurations.your-username = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      modules = [
+        {
+          home.packages = [
+            dindoa.packages.x86_64-linux.dindoa
+          ];
+        }
+      ];
+    };
+  };
+}
+```
+
+### Nix profile (zonder flakes)
+
+```bash
+# Installeer in je profiel
+nix profile install github:torreirow/dindoa
+
+# Of met specifieke versie
+nix profile install github:torreirow/dindoa/v0.1.1
+```
+
+### Development shell
+
+```bash
+# Clone de repository
+git clone https://github.com/torreirow/dindoa.git
+cd dindoa
+
+# Start development shell met Go tooling
+nix develop
+
+# Build in de shell
+go build -o dindoa cmd/dindoa/main.go
+```
+
+</details>
+
+<details>
+<summary><b>🔧 Vanaf bron (Go)</b></summary>
+
+### Vereisten
+- Go 1.25.7 of hoger
+
+### Build
 
 ```bash
 git clone https://github.com/torreirow/dindoa.git
@@ -26,6 +153,8 @@ go build -o dindoa cmd/dindoa/main.go
 ```bash
 go install github.com/torreirow/dindoa/cmd/dindoa@latest
 ```
+
+</details>
 
 ## Gebruik
 
@@ -40,7 +169,8 @@ dindoa --help
 dindoa -h
 ```
 
-### Interactive Mode
+<details>
+<summary><b>🎨 Interactive Mode</b></summary>
 
 Start de tool met het `start` commando voor een interactieve interface:
 
@@ -53,9 +183,12 @@ Dit opent een terminal UI waar je:
 2. Een team kiest
 3. Automatisch een ICS bestand wordt gegenereerd
 
-### CLI Mode (voor scripting)
+</details>
 
-#### Lijst alle categorieën
+<details>
+<summary><b>⌨️ CLI Mode (voor scripting)</b></summary>
+
+### Lijst alle categorieën
 
 ```bash
 dindoa --list-categories
@@ -72,7 +205,7 @@ Groen
 Blauw
 ```
 
-#### Lijst teams in een categorie
+### Lijst teams in een categorie
 
 ```bash
 dindoa --category rood --list-teams
@@ -92,7 +225,7 @@ dindoa --category ROOD --list-teams
 dindoa --category Rood --list-teams
 ```
 
-#### Lijst alle teams gesorteerd per categorie
+### Lijst alle teams gesorteerd per categorie
 
 ```bash
 dindoa --list-all-teams
@@ -111,7 +244,7 @@ Oranje:
   ...
 ```
 
-#### Genereer ICS voor een team
+### Genereer ICS voor een team
 
 ```bash
 dindoa --team j3
@@ -125,14 +258,16 @@ Team namen zijn flexibel:
 - `dindoa --team "Dindoa J3"` ✓
 - `dindoa --team "dindoa j3"` ✓
 
-#### Custom output bestand
+### Custom output bestand
 
 ```bash
 dindoa --team j3 --output mijn-wedstrijden.ics
 ```
 
+</details>
 
-## ICS Bestand Details
+<details>
+<summary><b>📅 ICS Bestand Details</b></summary>
 
 Gegenereerde ICS bestanden bevatten:
 
@@ -141,7 +276,10 @@ Gegenereerde ICS bestanden bevatten:
 - **Locatie**: Volledig adres via OpenStreetMap geocoding (met fallback naar originele tekst)
 - **UID**: Unieke identifier per wedstrijd
 
-## Caching
+</details>
+
+<details>
+<summary><b>💾 Caching</b></summary>
 
 Geocoding resultaten worden gecached op:
 
@@ -156,9 +294,12 @@ Dit zorgt voor:
 
 De eerste run kan langzaam zijn door geocoding (1 request/seconde rate limit), maar daarna is het instant.
 
+</details>
+
 ## Voorbeelden
 
-### Basis workflow
+<details>
+<summary><b>Basis workflow</b></summary>
 
 ```bash
 # Toon help
@@ -173,7 +314,10 @@ dindoa --team j3
 # Importeer dindoa-j3.ics in je kalender app
 ```
 
-### Alle teams van een categorie
+</details>
+
+<details>
+<summary><b>Alle teams van een categorie</b></summary>
 
 ```bash
 # Zie welke teams er zijn
@@ -185,7 +329,10 @@ dindoa --team j2
 dindoa --team j3
 ```
 
-### Scripting
+</details>
+
+<details>
+<summary><b>Scripting</b></summary>
 
 ```bash
 #!/usr/bin/env bash
@@ -197,9 +344,24 @@ for team in $(dindoa --category rood --list-teams | grep -o 'J[0-9]'); do
 done
 ```
 
+**Met Nix:**
+
+```bash
+#!/usr/bin/env bash
+# Geen lokale installatie nodig
+
+for team in j1 j2 j3 j4; do
+  echo "Generating ICS for $team..."
+  nix run github:torreirow/dindoa -- --team "$team"
+done
+```
+
+</details>
+
 ## Troubleshooting
 
-### Geocoding faalt
+<details>
+<summary><b>Geocoding faalt</b></summary>
 
 Als een locatie niet gevonden wordt door OpenStreetMap:
 - De originele locatie tekst wordt gebruikt als fallback
@@ -214,7 +376,10 @@ nano ~/.cache/dindoa/geocode.json
 # Pas het adres aan voor een specifieke locatie
 ```
 
-### Team niet gevonden
+</details>
+
+<details>
+<summary><b>Team niet gevonden</b></summary>
 
 ```
 Error: fetch team page: status 404
@@ -225,7 +390,10 @@ Mogelijke oorzaken:
 - Team bestaat niet (controleer dindoa.nl)
 - Website structuur veranderd
 
-### Geen wedstrijden
+</details>
+
+<details>
+<summary><b>Geen wedstrijden</b></summary>
 
 ```
 No matches found for this team
@@ -233,9 +401,11 @@ No matches found for this team
 
 Dit team heeft (nog) geen geplande wedstrijden dit seizoen.
 
+</details>
+
 ## Technische Details
 
-- **Taal**: Go
+- **Taal**: Go 1.25.7
 - **Dependencies**:
   - Bubbletea (TUI framework)
   - goquery (HTML parsing)
@@ -243,6 +413,8 @@ Dit team heeft (nog) geen geplande wedstrijden dit seizoen.
   - xdg (cross-platform paths)
 - **Data source**: https://dindoa.nl/ws/
 - **Geocoding**: OpenStreetMap Nominatim (rate limited: 1 req/sec)
+- **Platforms**: Linux, macOS, Windows (amd64 & arm64)
+- **Package managers**: Nix, Go modules
 
 ## License
 
