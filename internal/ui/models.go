@@ -167,5 +167,11 @@ func (m model) viewDone() string {
 }
 
 func (m model) viewError() string {
-	return fmt.Sprintf("Error: %v\n\n[enter: afsluiten]\n", m.err)
+	// Name only the keys that work here; promising one that does nothing is the
+	// kind of drift this screen is being fixed for.
+	keys := "[enter: afsluiten]"
+	if m.canReturnToTeams() {
+		keys = "[enter: terug naar de teamlijst] [q: afsluiten]"
+	}
+	return fmt.Sprintf("Error: %v\n\n%s\n", m.err, keys)
 }

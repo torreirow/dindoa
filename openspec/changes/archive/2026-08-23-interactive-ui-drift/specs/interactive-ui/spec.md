@@ -1,8 +1,5 @@
-# interactive-ui Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change dindoa-ics-generator. Update Purpose after archive.
-## Requirements
 ### Requirement: Launch interactive mode by default
 
 The system SHALL start the interactive terminal UI when invoked with the `start` command, and SHALL show usage information when invoked without arguments.
@@ -26,36 +23,6 @@ The system SHALL start the interactive terminal UI when invoked with the `start`
 
 - **WHEN** user runs "dindoa --category rood" without other flags
 - **THEN** system launches the interactive UI with that category pre-selected
-
-### Requirement: Display category selection screen
-The system SHALL present a list of available team categories for user selection.
-
-#### Scenario: Show category list
-- **WHEN** interactive UI starts
-- **THEN** system displays list of all categories (Senioren, Wedstrijdsport, Rood, Oranje, Geel, Groen, Blauw, etc.)
-
-#### Scenario: Navigate categories
-- **WHEN** user presses up/down arrow keys
-- **THEN** selection cursor moves through category list
-
-#### Scenario: Select category
-- **WHEN** user presses Enter on a category
-- **THEN** system proceeds to team selection screen for that category
-
-### Requirement: Display team selection screen
-The system SHALL present a list of teams within the selected category for user selection.
-
-#### Scenario: Show teams for category
-- **WHEN** user selects a category
-- **THEN** system displays list of all teams in that category
-
-#### Scenario: Navigate teams
-- **WHEN** user presses up/down arrow keys on team selection screen
-- **THEN** selection cursor moves through team list
-
-#### Scenario: Select team
-- **WHEN** user presses Enter on a team
-- **THEN** system proceeds to generate ICS file for that team
 
 ### Requirement: Handle errors gracefully in UI
 
@@ -86,16 +53,7 @@ The system SHALL display clear error messages in the interactive UI when operati
 - **WHEN** the UI displays an error
 - **THEN** the screen names the keys that actually work on it
 
-### Requirement: Support UI navigation controls
-The system SHALL respond to standard keyboard controls for navigation and exit.
-
-#### Scenario: Exit interactive mode
-- **WHEN** user presses Ctrl+C or Esc
-- **THEN** system exits cleanly without error
-
-#### Scenario: Navigate with arrow keys
-- **WHEN** user presses up/down arrows
-- **THEN** selection cursor moves accordingly in lists
+## ADDED Requirements
 
 ### Requirement: Show progress and result of generation
 
@@ -121,3 +79,10 @@ The system SHALL display progress while fetching and processing match data, and 
 - **WHEN** generation completes and one or more venues were not present in the location mapping
 - **THEN** UI lists those venues with the number of affected matches and where to add them
 
+## REMOVED Requirements
+
+### Requirement: Show progress during operations
+
+**Reason**: Deze requirement beschreef voortgang tijdens "scraping and geocoding", met een scenario per gegeocodeerde locatie. Geocoding tijdens het genereren is verwijderd; adressen komen uit een meegeleverde lijst en er is geen stap per locatie meer waarvan voortgang te tonen is. Ook de naam van de requirement dekt de lading niet meer, want er is geen tweede langdurige bewerking naast het ophalen van de pagina. Deze opruiming had bij de vorige change moeten gebeuren, waar "geen wijziging aan de interactieve UI" als non-goal stond terwijl het verwerkingsscherm wel veranderde.
+
+**Migration**: Vervangen door "Show progress and result of generation", die het ophalen, het verwerken van het gekozen team en het melden van locaties zonder adres beschrijft. Er is geen actie nodig van gebruikers.
