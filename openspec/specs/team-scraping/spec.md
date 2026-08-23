@@ -146,3 +146,18 @@ The system SHALL parse the match programme page to extract all matches for a giv
 - **WHEN** the programme page loads but the table headers do not match the expected columns
 - **THEN** system returns an error identifying the unexpected layout rather than returning an empty match list
 
+#### Scenario: Reject an unreadable kick-off time
+
+- **WHEN** the time column holds a value that cannot be read as HH:MM, such as "13.45", "1345" or an empty cell
+- **THEN** system returns an error naming the match and the value found, rather than deriving a time from it
+
+#### Scenario: Reject a kick-off time outside the clock
+
+- **WHEN** the time column holds hours above 23 or minutes above 59, such as "25:99"
+- **THEN** system returns an error, because normalising such a value silently moves the event to another moment
+
+#### Scenario: Accept a single-digit hour
+
+- **WHEN** the time column holds "9:30"
+- **THEN** system reads it as half past nine
+
