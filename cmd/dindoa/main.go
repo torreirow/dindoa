@@ -38,7 +38,7 @@ func main() {
 	args := flag.Args()
 
 	if len(args) > 0 && args[0] == "start" {
-		p := ui.NewInteractiveApp()
+		p := ui.NewInteractiveApp(*category)
 		if _, err := p.Run(); err != nil {
 			fail(err)
 		}
@@ -56,6 +56,14 @@ func main() {
 		run(handleListLocations)
 	case *team != "":
 		run(func() error { return handleGenerateICS(*team, *output) })
+	case *category != "":
+		// A category on its own launches the interactive UI with that category
+		// pre-selected.
+		p := ui.NewInteractiveApp(*category)
+		if _, err := p.Run(); err != nil {
+			fail(err)
+		}
+		os.Exit(0)
 	case *output != "":
 		fmt.Fprintf(os.Stderr, "Error: --output requires --team flag\n")
 		os.Exit(1)
@@ -297,6 +305,7 @@ func printUsage() {
 	fmt.Println("  dindoa start                              Start interactive mode")
 	fmt.Println("  dindoa --list-categories                  List all categories")
 	fmt.Println("  dindoa --category <name> --list-teams     List teams in category")
+	fmt.Println("  dindoa --category <name>                  Interactive mode, category pre-selected")
 	fmt.Println("  dindoa --list-all-teams                   List all teams by category")
 	fmt.Println("  dindoa --list-locations                   List venues and their address status")
 	fmt.Println("  dindoa --team <name>                      Generate ICS for team")
@@ -308,6 +317,7 @@ func printUsage() {
 	fmt.Println("  dindoa --team j3                          Generate dindoa-j3.ics")
 	fmt.Println("  dindoa --team j3 --output eigen.ics       Generate with a custom filename")
 	fmt.Println("  dindoa --category rood --list-teams       List teams in Rood category")
+	fmt.Println("  dindoa --category rood                    Pick a Rood team interactively")
 	fmt.Println("  dindoa --list-locations                   See which venues need an address")
 	fmt.Println()
 	fmt.Printf("Match data comes from %s\n", scraper.ProgrammaURL())

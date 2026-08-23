@@ -236,6 +236,14 @@ dindoa --category ROOD --list-teams
 dindoa --category Rood --list-teams
 ```
 
+Laat je `--list-teams` weg, dan opent de interactieve modus met die categorie al gekozen:
+
+```bash
+dindoa --category rood
+```
+
+Je komt direct in de teamlijst van Rood terecht. Bestaat de categorie niet, dan verschijnt het gewone keuzemenu met een melding erboven.
+
 ### Lijst alle teams gesorteerd per categorie
 
 ```bash
