@@ -5,6 +5,19 @@
 
 ### Fixed
 
+- **Aanvangstijd werd stil verkeerd gelezen**: De tijdkolom werd met `fmt.Sscanf("%d:%d")` gelezen
+  zonder te controleren of dat lukte, en `time.Date` normaliseert waarden buiten bereik zonder te
+  klagen. Een gewijzigde notatie leverde daardoor een geldig ICS-bestand op het verkeerde moment op:
+  `13.45` gaf 45 minuten verschil, en `1345` schoof het event 56 dagen op naar eind oktober. Zonder
+  waarschuwing.
+  - De tijd wordt nu gevalideerd waar de bron wordt gelezen, naast de bestaande controle op de
+    kolomkoppen. Een afwijking geeft een fout die de wedstrijd en de aangetroffen waarde noemt.
+  - Er wordt bewust niet gegokt. `19.00` naar `19:00` raden lijkt vriendelijk, maar dat is een
+    aanname over de bedoeling van een gewijzigde bron.
+  - Een fout laat de hele pagina falen in plaats van één rij over te slaan; een halve agenda is
+    misleidender dan geen agenda.
+  - Alle 210 op dit moment gepubliceerde rijen gebruiken `HH:MM`, dus er was niets actief fout. Dit
+    sluit een latent gat.
 - **Doodlopend foutscherm in de interactieve modus**: Ging er iets mis nadat je een team had gekozen,
   dan kon je alleen nog afsluiten en de tool opnieuw starten — inclusief het opnieuw ophalen van het
   wedstrijdprogramma. Nu keer je met enter terug naar de teamlijst en kies je een ander team; de

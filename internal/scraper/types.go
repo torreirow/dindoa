@@ -1,7 +1,9 @@
 package scraper
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -99,6 +101,34 @@ func IsDindoaTeam(teamName string) bool {
 //	"Antilopen/Bloemendal Bouw J3"  -> "Antilopen/Bloemendal Bouw"
 func ClubName(teamName string) string {
 	return strings.TrimSpace(teamSuffix.ReplaceAllString(strings.TrimSpace(teamName), ""))
+}
+
+// timePattern matches a kick-off time as published: one or two digits for the
+// hour, a colon, two digits for the minute.
+var timePattern = regexp.MustCompile(`^(\d{1,2}):(\d{2})$`)
+
+// ParseKickOff reads a kick-off time as published in the programme.
+//
+// It is deliberately strict. fmt.Sscanf would accept "13.45" as hour 13 and
+// leave the minute at zero, and "1345" as hour 1345, which time.Date then
+// normalises into a date weeks away without complaining. Both produce a valid
+// calendar file for the wrong moment, which nobody notices until someone shows
+// up at a locked door.
+func ParseKickOff(s string) (hour, minute int, err error) {
+	m := timePattern.FindStringSubmatch(strings.TrimSpace(s))
+	if m == nil {
+		return 0, 0, fmt.Errorf("kick-off time %q is not in HH:MM form", s)
+	}
+
+	hour, _ = strconv.Atoi(m[1])
+	minute, _ = strconv.Atoi(m[2])
+	if hour > 23 {
+		return 0, 0, fmt.Errorf("kick-off time %q has hour %d, which is not on the clock", s, hour)
+	}
+	if minute > 59 {
+		return 0, 0, fmt.Errorf("kick-off time %q has minute %d, which is not on the clock", s, minute)
+	}
+	return hour, minute, nil
 }
 
 // CategoryOf returns the category for a colour value.

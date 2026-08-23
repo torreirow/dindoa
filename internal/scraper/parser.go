@@ -132,6 +132,17 @@ func (p *Parser) ParseProgramma(doc *goquery.Document, now time.Time) (*Programm
 			if r.time == "" || r.home == "" || r.away == "" {
 				return
 			}
+			// Validate here, where the source is interpreted, next to the
+			// column check. A changed time format affects the whole page, so
+			// failing on the page is right; skipping the row would hand the
+			// user half a calendar, which is worse than none.
+			if _, _, err := ParseKickOff(r.time); err != nil {
+				if headerError == nil {
+					headerError = fmt.Errorf("match on %d %s between %q and %q: %w",
+						r.day, dutchMonthName(r.month), r.home, r.away, err)
+				}
+				return
+			}
 			rows = append(rows, r)
 		})
 	})
@@ -166,6 +177,17 @@ func (p *Parser) ParseProgramma(doc *goquery.Document, now time.Time) (*Programm
 	}
 
 	return &Programma{Matches: matches}, nil
+}
+
+// dutchMonthName renders a month as it appears in the page headings, so an
+// error message points at the same date the reader sees on the site.
+func dutchMonthName(m time.Month) string {
+	for name, month := range dutchMonths {
+		if month == m {
+			return name
+		}
+	}
+	return m.String()
 }
 
 // verifyHeaders reports an error unless the table carries the expected columns.

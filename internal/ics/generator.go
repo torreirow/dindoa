@@ -173,10 +173,16 @@ func (g *Generator) formatDescription(match scraper.Match, entry locations.Entry
 }
 
 // parseMatchDateTime combines date and time into a single time.Time in
-// Europe/Amsterdam timezone.
+// Europe/Amsterdam timezone. The time has already been validated while parsing
+// the programme; using the same function here keeps a single interpretation of
+// the field, so a future caller cannot quietly reintroduce a guess.
 func (g *Generator) parseMatchDateTime(match scraper.Match) time.Time {
-	var hour, minute int
-	fmt.Sscanf(match.Time, "%d:%d", &hour, &minute)
+	hour, minute, err := scraper.ParseKickOff(match.Time)
+	if err != nil {
+		// Unreachable through the normal path; midnight is a visible oddity
+		// rather than a date silently weeks away.
+		hour, minute = 0, 0
+	}
 
 	return time.Date(
 		match.Date.Year(),

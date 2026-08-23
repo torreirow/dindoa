@@ -290,3 +290,92 @@ func TestNoDindoaVersusDindoaInFixture(t *testing.T) {
 		}
 	}
 }
+
+func TestParseKickOffAcceptsPublishedForms(t *testing.T) {
+	for in, want := range map[string][2]int{
+		"13:45": {13, 45},
+		"9:30":  {9, 30},
+		"09:30": {9, 30},
+		"00:00": {0, 0},
+		"23:59": {23, 59},
+		" 9:30": {9, 30},
+	} {
+		h, m, err := ParseKickOff(in)
+		if err != nil {
+			t.Errorf("ParseKickOff(%q) failed: %v", in, err)
+			continue
+		}
+		if h != want[0] || m != want[1] {
+			t.Errorf("ParseKickOff(%q) = %d:%02d, want %d:%02d", in, h, m, want[0], want[1])
+		}
+	}
+}
+
+// Each of these used to pass through and produce a calendar entry at the wrong
+// moment; "1345" landed 56 days away because time.Date normalises hour 1345.
+func TestParseKickOffRejectsEverythingElse(t *testing.T) {
+	for _, in := range []string{"13.45", "1345", "", "abc", "25:99", "24:00", "13:60", "13:4", "13:456", "-1:00"} {
+		if _, _, err := ParseKickOff(in); err == nil {
+			t.Errorf("ParseKickOff(%q) should have failed", in)
+		} else if !strings.Contains(err.Error(), in) && in != "" {
+			t.Errorf("error for %q should quote the value, got: %v", in, err)
+		}
+	}
+}
+
+func TestUnreadableTimeFailsTheWholePage(t *testing.T) {
+	// A changed time format affects every row, so half a calendar would be
+	// more misleading than none.
+	html := `<html><body><div class="page-content"><h3>5 september</h3>
+	<table><thead><tr><th>Tijd</th><th>Thuis</th><th>Uit</th><th>Kleur</th><th>Locatie</th><th>Scheidsrechter</th></tr></thead>
+	<tbody>
+	<tr><td>11:50</td><td>Dindoa J3</td><td>Anders J3</td><td>Rood</td><td>Ergens ERMELO</td><td></td></tr>
+	<tr><td>13.45</td><td>Dindoa J4</td><td>Anders J4</td><td>Rood</td><td>Ergens ERMELO</td><td></td></tr>
+	</tbody></table></div></body></html>`
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+
+	prog, err := NewParser().ParseProgramma(doc, refNow)
+	if err == nil {
+		t.Fatalf("expected an error; got %d matches", len(prog.Matches))
+	}
+	for _, want := range []string{"13.45", "5 september", "Dindoa J4"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("error should mention %q, got: %v", want, err)
+		}
+	}
+}
+
+func TestColumnCheckTakesPrecedenceOverTimeCheck(t *testing.T) {
+	// A reordered table should be reported as a layout problem, not as a
+	// strange time, so the message points at the real cause.
+	html := `<html><body><div class="page-content"><h3>5 september</h3>
+	<table><thead><tr><th>Thuis</th><th>Tijd</th><th>Uit</th><th>Kleur</th><th>Locatie</th><th>Scheidsrechter</th></tr></thead>
+	<tbody><tr><td>Dindoa J3</td><td>11:50</td><td>Anders J3</td><td>Rood</td><td>Ergens ERMELO</td><td></td></tr></tbody>
+	</table></div></body></html>`
+
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(html))
+	_, err := NewParser().ParseProgramma(doc, refNow)
+	if err == nil {
+		t.Fatal("expected an error for a reordered table")
+	}
+	if !strings.Contains(err.Error(), "unexpected match table layout") {
+		t.Errorf("should report the layout, got: %v", err)
+	}
+}
+
+// The published programme must keep parsing: 210 rows, all HH:MM.
+func TestRealFixtureStillParses(t *testing.T) {
+	prog := loadProgramma(t)
+	if got := len(prog.Matches); got != 210 {
+		t.Errorf("matches = %d, want 210", got)
+	}
+	for _, m := range prog.Matches {
+		if _, _, err := ParseKickOff(m.Time); err != nil {
+			t.Errorf("fixture row has an unreadable time %q: %v", m.Time, err)
+		}
+	}
+}

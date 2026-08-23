@@ -386,3 +386,37 @@ func stripEdition(s string) string {
 	}
 	return strings.Join(keep, "\n")
 }
+
+// The regression this change is about: no input may place an event on a date
+// other than the one in the heading above the table. "1345" used to land 56
+// days away because time.Date normalises hour 1345.
+func TestNoInputMovesTheEventToAnotherDate(t *testing.T) {
+	want := day(2026, time.September, 5)
+
+	for _, tt := range []string{"13:45", "9:30", "13.45", "1345", "", "abc", "25:99", "24:00"} {
+		m := j4Match()
+		m.Time = tt
+
+		got := generateAt(t, refGenTime, []scraper.Match{m})
+
+		var start string
+		for _, line := range strings.Split(got, "\n") {
+			if v, ok := strings.CutPrefix(strings.TrimRight(line, "\r"), "DTSTART:"); ok {
+				start = v
+			}
+		}
+		if len(start) < 8 {
+			t.Fatalf("Time=%q gave no DTSTART", tt)
+		}
+		// DTSTART is UTC; the match is local, so the previous day is legitimate
+		// for an early kick-off but nothing further away is.
+		gotDay, err := time.Parse("20060102", start[:8])
+		if err != nil {
+			t.Fatalf("Time=%q gave unparseable DTSTART %q", tt, start)
+		}
+		if d := want.Sub(gotDay).Hours() / 24; d < 0 || d > 1 {
+			t.Errorf("Time=%q put the event on %s, %.0f days from the heading date %s",
+				tt, gotDay.Format("2006-01-02"), d, want.Format("2006-01-02"))
+		}
+	}
+}

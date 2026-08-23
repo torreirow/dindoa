@@ -517,6 +517,17 @@ De opmaak van het wedstrijdprogramma op dindoa.nl is gewijzigd. De tool geeft hi
 </details>
 
 <details>
+<summary><b>Foutmelding over de aanvangstijd</b></summary>
+
+```
+Error: parse match programme (...): match on 5 september between "Dindoa J4" and "Anders J4": kick-off time "13.45" is not in HH:MM form
+```
+
+De tijdnotatie op de pagina is gewijzigd. De tool weigert hier bewust te gokken: `13.45` als `13:45` lezen levert een agenda op met wedstrijden op het verkeerde moment, en een waarde als `1345` zou het event zelfs weken opschuiven. Dat merk je pas als iemand voor een dichte deur staat. Meld dit als issue.
+
+</details>
+
+<details>
 <summary><b>Foutmelding over het seizoensjaar</b></summary>
 
 ```
