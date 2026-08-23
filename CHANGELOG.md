@@ -3,6 +3,21 @@
 
 ## NEXT VERSION
 
+### Added
+
+- **`SEQUENCE` in ICS-events**: Elk event krijgt een revisienummer dat bij elke keer genereren
+  oploopt, zodat een agenda-app die revisies bijhoudt een nieuw bestand als nieuwer herkent. Zonder
+  dit veld gedraagt de uitvoer zich volgens RFC 5545 als revisie 0, waardoor een strikte client een
+  echte wijziging kon negeren. Het wedstrijdprogramma wordt in blokken gepubliceerd, dus opnieuw
+  genereren is de normale gang van zaken en niet de uitzondering.
+  - De waarde is afgeleid van het genereermoment, niet van de wedstrijdgegevens. Deze tool houdt
+    geen staat bij en weet dus niet welke revisie een wedstrijd al had; een teller op basis van de
+    inhoud kan niet monotoon oplopen zoals de standaard vereist.
+  - Alle events in één bestand hebben dezelfde waarde: de revisie hoort bij de uitgave van de
+    kalender, net als `DTSTAMP`.
+  - De waarde loopt ook op als er niets veranderd is. Dat is onschadelijk, en het is de reden dat er
+    bewust niet per wedstrijd geteld wordt.
+
 ### Changed
 
 - **Wedstrijdprogramma als bron**: Wedstrijden, teams, categorieën en kleuren komen nu uit

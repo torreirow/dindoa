@@ -3,6 +3,7 @@ package ics
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +21,9 @@ const matchDuration = time.Hour
 type Generator struct {
 	timezone *time.Location
 	mapping  *locations.Mapping
+	// now is the clock used for DTSTAMP and for the revision number. It is a
+	// field so a test can produce two editions without waiting a minute.
+	now func() time.Time
 }
 
 // NewGenerator creates a new ICS generator using the given location mapping.
@@ -35,6 +39,7 @@ func NewGenerator(mapping *locations.Mapping) (*Generator, error) {
 	return &Generator{
 		timezone: tz,
 		mapping:  mapping,
+		now:      time.Now,
 	}, nil
 }
 
@@ -46,13 +51,18 @@ func (g *Generator) Generate(teamName string, matches []scraper.Match, outputFil
 	cal.SetVersion("2.0")
 	cal.SetProductId("-//Dindoa//Dindoa ICS Generator//NL")
 
+	// One revision number per file: SEQUENCE identifies this edition of the
+	// calendar, not the individual match.
+	stamp := g.now()
+	sequence := revision(stamp)
+
 	missing := map[string]int{}
 	for _, match := range matches {
 		entry, found := g.resolve(match.Location)
 		if !found && match.Location != "" {
 			missing[match.Location]++
 		}
-		cal.AddVEvent(g.createEvent(teamName, match, entry, found))
+		cal.AddVEvent(g.createEvent(teamName, match, entry, found, stamp, sequence))
 	}
 
 	if err := os.WriteFile(outputFile, []byte(cal.Serialize()), 0o644); err != nil {
@@ -70,10 +80,12 @@ func (g *Generator) resolve(venue string) (locations.Entry, bool) {
 }
 
 // createEvent creates an ICS event for a match
-func (g *Generator) createEvent(teamName string, match scraper.Match, entry locations.Entry, found bool) *ics.VEvent {
+func (g *Generator) createEvent(teamName string, match scraper.Match, entry locations.Entry, found bool,
+	stamp time.Time, sequence int64) *ics.VEvent {
 	event := ics.NewEvent(g.generateUID(teamName, match))
 
-	event.SetDtStampTime(time.Now())
+	event.SetDtStampTime(stamp)
+	event.AddProperty(ics.ComponentPropertySequence, strconv.FormatInt(sequence, 10))
 
 	start := g.parseMatchDateTime(match)
 	event.SetStartAt(start)
@@ -91,6 +103,16 @@ func (g *Generator) createEvent(teamName string, match scraper.Match, entry loca
 	}
 
 	return event
+}
+
+// revision returns the value written as SEQUENCE: minutes since the Unix
+// epoch. This generator keeps no state, so it cannot know which revision a
+// match already had, and RFC 5545 requires SEQUENCE to increase monotonically
+// per UID. Time is the only quantity that does that without state. Minutes
+// give roughly 3e7 today, well inside a 32-bit signed integer, and two runs in
+// the same minute are in practice the same file.
+func revision(t time.Time) int64 {
+	return t.Unix() / 60
 }
 
 // formatLocation keeps the readable venue name from the website and appends the
