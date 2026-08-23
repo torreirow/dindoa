@@ -165,11 +165,29 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 			return m, generateICS(m.programma, m.selectedTeam)
 		}
 
-	case stateDone, stateError:
+	case stateDone:
+		return m, tea.Quit
+
+	case stateError:
+		// After a team was chosen the programme data is still in the model, so
+		// the team list is a valid destination and needs no new request.
+		if m.canReturnToTeams() {
+			m.err = nil
+			m.state = stateTeamSelection
+			m.selected = 0
+			return m, nil
+		}
 		return m, tea.Quit
 	}
 
 	return m, nil
+}
+
+// canReturnToTeams reports whether there is an earlier screen worth returning
+// to. Derived from the model rather than stored separately, so it cannot drift
+// when a screen is added.
+func (m model) canReturnToTeams() bool {
+	return m.programma != nil && len(m.teams) > 0
 }
 
 // findCategory looks up a category by name, ignoring case.

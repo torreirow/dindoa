@@ -5,6 +5,12 @@
 
 ### Fixed
 
+- **Doodlopend foutscherm in de interactieve modus**: Ging er iets mis nadat je een team had gekozen,
+  dan kon je alleen nog afsluiten en de tool opnieuw starten — inclusief het opnieuw ophalen van het
+  wedstrijdprogramma. Nu keer je met enter terug naar de teamlijst en kies je een ander team; de
+  programmagegevens zitten al in het geheugen, dus dat kost geen nieuw netwerkverzoek. Gaat het
+  ophalen van het programma zelf mis, dan is er niets om naar terug te keren en biedt het scherm
+  alleen afsluiten. Het foutscherm noemt nu de toetsen die er werkelijk werken.
 - **`--category` zonder `--list-teams`**: Dit startte de help in plaats van de interactieve modus,
   terwijl de specificatie voorschrijft dat de categorie dan voorgeselecteerd wordt. Nu kom je met
   `dindoa --category rood` direct in de teamlijst van Rood. Bestaat de categorie niet, dan verschijnt
