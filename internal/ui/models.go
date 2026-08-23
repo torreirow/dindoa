@@ -2,17 +2,20 @@ package ui
 
 import (
 	"fmt"
+	"sort"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/torreirow/dindoa/internal/geocode"
 	"github.com/torreirow/dindoa/internal/ics"
+	"github.com/torreirow/dindoa/internal/locations"
 	"github.com/torreirow/dindoa/internal/scraper"
 )
 
 // Message types
 
-type categoriesMsg struct {
+type programmaMsg struct {
+	programma  *scraper.Programma
 	categories []scraper.Category
 	err        error
 }
@@ -24,98 +27,59 @@ type teamsMsg struct {
 type doneMsg struct {
 	outputFile string
 	matchCount int
+	missing    map[string]int
+	userPath   string
 	err        error
 }
 
 // Commands
 
-func fetchCategories(fetcher *scraper.Fetcher, parser *scraper.Parser) tea.Cmd {
+// fetchProgramma loads the match programme once. It is the single source for
+// categories, teams and matches, so the UI never fetches twice.
+func fetchProgramma(fetcher *scraper.Fetcher, parser *scraper.Parser) tea.Cmd {
 	return func() tea.Msg {
-		doc, err := fetcher.FetchTeamsPage()
+		doc, err := fetcher.FetchProgrammaPage()
 		if err != nil {
-			return categoriesMsg{err: err}
+			return programmaMsg{err: fmt.Errorf("fetch match programme: %w", err)}
 		}
 
-		categories, err := parser.ParseTeams(doc)
+		prog, err := parser.ParseProgramma(doc, time.Now())
 		if err != nil {
-			return categoriesMsg{err: err}
+			return programmaMsg{err: fmt.Errorf("parse match programme (%s): %w", scraper.ProgrammaURL(), err)}
 		}
 
-		return categoriesMsg{categories: categories}
+		return programmaMsg{programma: prog, categories: prog.Categories()}
 	}
 }
 
-func generateICS(teamName string) tea.Cmd {
+func generateICS(prog *scraper.Programma, teamName string) tea.Cmd {
 	return func() tea.Msg {
-		// Normalize team name
-		teamSlug := scraper.NormalizeTeamName(teamName)
-
-		// Fetch matches
-		fetcher := scraper.NewFetcher()
-		parser := scraper.NewParser()
-
-		doc, err := fetcher.FetchTeamPage(teamSlug)
-		if err != nil {
-			return doneMsg{err: fmt.Errorf("fetch team page: %w", err)}
-		}
-
-		matches, err := parser.ParseMatches(doc)
-		if err != nil {
-			return doneMsg{err: fmt.Errorf("parse matches: %w", err)}
-		}
-
+		matches := prog.MatchesFor(teamName)
 		if len(matches) == 0 {
-			return doneMsg{err: fmt.Errorf("no matches found for this team")}
+			return doneMsg{err: fmt.Errorf("%s has no matches in the published part of the programme", teamName)}
 		}
 
-		// Initialize geocoding
-		cache, _ := geocode.NewCache()
-		rateLimiter := geocode.NewRateLimiter()
-		geocoder := geocode.NewClient(rateLimiter)
-
-		// Geocode locations
-		for i := range matches {
-			location := matches[i].Location
-
-			// Check cache
-			if cache != nil {
-				if result, found := cache.Lookup(location); found {
-					matches[i].Location = result.Address
-					continue
-				}
-			}
-
-			// Geocode
-			result := geocoder.Geocode(location)
-			matches[i].Location = result.Address
-
-			// Store in cache
-			if cache != nil {
-				cache.Store(result)
-			}
+		mapping, err := locations.Load()
+		if err != nil {
+			return doneMsg{err: fmt.Errorf("load location mapping: %w", err)}
 		}
 
-		// Generate ICS
-		generator, err := ics.NewGenerator()
+		generator, err := ics.NewGenerator(mapping)
 		if err != nil {
 			return doneMsg{err: fmt.Errorf("create generator: %w", err)}
 		}
 
 		outputFile := ics.DefaultOutputFilename(teamName)
-
-		// Use display name
-		displayName := teamName
-		if !strings.Contains(strings.ToLower(teamName), "dindoa") {
-			displayName = "Dindoa " + strings.ToUpper(teamName)
-		}
-
-		if err := generator.Generate(displayName, matches, outputFile); err != nil {
+		missing, err := generator.Generate(teamName, matches, outputFile)
+		if err != nil {
 			return doneMsg{err: fmt.Errorf("generate ICS: %w", err)}
 		}
 
 		return doneMsg{
 			outputFile: outputFile,
 			matchCount: len(matches),
+			missing:    missing,
+			userPath:   mapping.UserPath(),
 		}
 	}
 }
@@ -133,7 +97,7 @@ func (m model) viewCategorySelection() string {
 		if i == m.selected {
 			cursor = ">"
 		}
-		b.WriteString(fmt.Sprintf("%s %s\n", cursor, cat.Name))
+		b.WriteString(fmt.Sprintf("%s %s (%d teams)\n", cursor, cat.Name, len(cat.Teams)))
 	}
 
 	b.WriteString("\n[↑↓: navigeren] [enter: kiezen] [q: afsluiten]\n")
@@ -161,16 +125,39 @@ func (m model) viewTeamSelection() string {
 }
 
 func (m model) viewProcessing() string {
-	return fmt.Sprintf("Wedstrijden ophalen voor %s...\n\nGeocoding locaties...\n", m.selectedTeam)
+	return fmt.Sprintf("Wedstrijden verwerken voor %s...\n", m.selectedTeam)
 }
 
 func (m model) viewDone() string {
 	var b strings.Builder
 
 	b.WriteString("✓ ICS bestand aangemaakt!\n\n")
-	b.WriteString(fmt.Sprintf("Bestand: %s\n", m.outputFile))
-	b.WriteString(fmt.Sprintf("Wedstrijden: %d\n\n", m.matchCount))
-	b.WriteString("Import in je kalender app.\n\n")
+	b.WriteString(fmt.Sprintf("Bestand:     %s\n", m.outputFile))
+	b.WriteString(fmt.Sprintf("Team:        %s\n", m.selectedTeam))
+	b.WriteString(fmt.Sprintf("Wedstrijden: %d\n", m.matchCount))
+
+	if len(m.missing) > 0 {
+		venues := make([]string, 0, len(m.missing))
+		for v := range m.missing {
+			venues = append(venues, v)
+		}
+		sort.Slice(venues, func(i, j int) bool {
+			if m.missing[venues[i]] != m.missing[venues[j]] {
+				return m.missing[venues[i]] > m.missing[venues[j]]
+			}
+			return venues[i] < venues[j]
+		})
+
+		b.WriteString(fmt.Sprintf("\n⚠ %d locatie(s) niet in de adressenlijst; de naam van de website is gebruikt:\n",
+			len(venues)))
+		for _, v := range venues {
+			b.WriteString(fmt.Sprintf("    %-42s (%d wedstrijd(en))\n", v, m.missing[v]))
+		}
+		b.WriteString(fmt.Sprintf("  Vul ze aan in %s — 'dindoa --list-locations' geeft een fragment om te plakken.\n",
+			m.userPath))
+	}
+
+	b.WriteString("\nImporteer het bestand in je kalender-app.\n\n")
 	b.WriteString("[enter: afsluiten]\n")
 
 	return b.String()

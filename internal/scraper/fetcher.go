@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	baseURL    = "https://dindoa.nl/ws"
-	userAgent  = "Dindoa-ICS-Generator/1.0"
-	timeout    = 30 * time.Second
+	baseURL      = "https://dindoa.nl/ws"
+	programmaURL = baseURL + "/competitie-programma/"
+	userAgent    = "Dindoa-ICS-Generator/1.0"
+	timeout      = 30 * time.Second
 )
 
 // Fetcher handles HTTP requests and HTML parsing
@@ -55,15 +56,13 @@ func (f *Fetcher) FetchDocument(url string) (*goquery.Document, error) {
 	return doc, nil
 }
 
-// FetchTeamsPage fetches and returns the teams page document
-func (f *Fetcher) FetchTeamsPage() (*goquery.Document, error) {
-	url := fmt.Sprintf("%s/teams/", baseURL)
-	return f.FetchDocument(url)
+// FetchProgrammaPage fetches and returns the match programme document.
+// This page is the single source for matches, teams, categories and colours.
+func (f *Fetcher) FetchProgrammaPage() (*goquery.Document, error) {
+	return f.FetchDocument(programmaURL)
 }
 
-// FetchTeamPage fetches and returns a specific team's page document
-// teamSlug should be in the format "dindoa-j3"
-func (f *Fetcher) FetchTeamPage(teamSlug string) (*goquery.Document, error) {
-	url := fmt.Sprintf("%s/%s/", baseURL, teamSlug)
-	return f.FetchDocument(url)
+// ProgrammaURL returns the URL the match programme is read from.
+func ProgrammaURL() string {
+	return programmaURL
 }

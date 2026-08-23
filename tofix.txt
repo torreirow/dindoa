@@ -1,0 +1,102 @@
+TOFIX — adressen speellocaties Dindoa
+====================================================================================================
+
+Bijgewerkt: 23-08-2026, seizoen 2026/2027
+Bron wedstrijden  : https://dindoa.nl/ws/competitie-programma/
+Meegeleverde lijst: internal/locations/locations.json
+Jouw eigen lijst  : ~/.config/dindoa/locations.json  (overschrijft per locatie)
+Overzicht opnieuw : dindoa --list-locations
+
+STAND: 35 locaties / 210 wedstrijden — ALLE LOCATIES HEBBEN EEN ADRES
+  A  compleet, geen actie             24 locaties / 178 wedstrijden
+  B  huisnummer ontbreekt (optioneel) 11 locaties /  32 wedstrijden
+  C  ontbreekt volledig                0 locaties /   0 wedstrijden
+
+HISTORIE
+  23-08  De Zanderij bevestigd door de vereniging.
+  23-08  12 adressen toegevoegd (11 + Wolderwijd). Lijst C is daarmee leeg.
+
+Er is dus geen actie meer nodig. Lijst B hieronder is cosmetisch: die locaties hebben
+straat, postcode, plaats en exacte coordinaten, alleen geen huisnummer. Navigeren werkt.
+
+
+B — HUISNUMMER ONTBREEKT (optioneel, lage prioriteit)
+====================================================================================================
+
+ wed  locatie                                    huidig adres                                   sleutel
+----------------------------------------------------------------------------------------------------
+   8x Sportpark Putter Eng PUTTEN                Halvinkhuizerweg, 3882 LA Putten               sportpark putter eng putten
+   6x Veld MIA AMERSFOORT                        Schothorsterlaan, 3822 NB Amersfoort           veld mia amersfoort
+   4x Sportcomplex De Voorde VOORTHUIZEN         Jan de Jagerweg, 3781 BS Voorthuizen           sportcomplex de voorde voorthuizen
+   4x Sportpark Oosterbos BARNEVELD              Wethouder Rebellaan, 3771 XL Barneveld         sportpark oosterbos barneveld
+   3x Sportpark Hagenbroek KAMPEN                Beneluxweg, 8264 DX Kampen                     sportpark hagenbroek kampen
+   2x Sportpark De Marslanden ZWOLLE             Primulapad, 8013 XH Zwolle                     sportpark de marslanden zwolle
+   1x Sportcomplex Sportlaan DRACHTEN            Zuiderhogeweg, 9204 WJ Drachten                sportcomplex sportlaan drachten
+   1x Sportpark De Eikelhof BENNEKOM             Kierkamperweg, 6721 TG Bennekom                sportpark de eikelhof bennekom
+   1x Sportpark De Groene Velden VEENENDAAL      Groene Velden, 3902 HA Veenendaal              sportpark de groene velden veenendaal
+   1x Sportpark De Wiltsangh NUNSPEET            Sportlaan, 8072 RB Nunspeet                    sportpark de wiltsangh nunspeet
+   1x Sportpark De Woerd DRIEBERGEN-RIJSENBURG   Hoge Woerd, 3972 KD Driebergen-Rijsenburg      sportpark de woerd driebergen rijsenburg
+
+
+A — COMPLEET
+====================================================================================================
+
+ wed  locatie                                    adres                                              bron
+----------------------------------------------------------------------------------------------------
+ 105x De Zanderij (Dindoa) ERMELO                Watervalweg 170, 3853 PT Ermelo                    manual
+  15x Het Slingerbos HARDERWIJK                  Slingerbos 1, 3844AC Harderwijk                    osm-tags
+  11x Sportpark Luxool NIJKERK                   Nachtegaalsteeg 2, 3862WH Nijkerk                  osm-tags
+   5x Burgermeester Buiningpark LEUSDEN          Bavoortseweg 27, 3833BM Leusden                    osm-tags
+   5x Veld ASVD DRONTEN                          Educalaan 39, 8251 GC Dronten                      manual
+   4x Sportpark Langezand LELYSTAD               Toeloop 16, 8223 PH Lelystad                       manual
+   4x Sportpark Middelaar HOEVELAKEN             Middelaarseweg 4b, 3871 KR Hoevelaken              osm-reverse
+   3x Burg. Bode Sportpark ELBURG                Zwolscheweg 8, 8081CG Elburg                       osm-tags
+   3x Sportpark De Maten KAMPEN                  De Maten 4, 8265 VA Kampen                         osm-reverse
+   3x Sportpark Erica Terpstra WEZEP             Rondweg 1, 8091 XA Wezep                           manual
+   3x Sportpark Overbeek TERSCHUUR               van de Bleekstraat 24, 3784 WZ Terschuur           manual
+   2x Sportpark De Grift WOUDENBERG              John F. Kennedylaan 116, 3931 XM Woudenberg        osm-reverse
+   2x Sportpark Oosterhof VAASSEN                Zichtstede 16, 8171NB Vaassen                      osm-tags
+   2x Sportveld DWS KOOTWIJKERBROEK              Doctor A.A. Jessestraat 3, 3774 JV Kootwijkerbroek manual
+   2x Tussenboerslanden (Nijeveen) NIJEVEEN      Tussenboersweg 8, 7948 LR Nijeveen                 manual
+   1x Meinga (Grou) GROU                         Burstumerdyk 1b, 9001ZC Grou                       osm-tags
+   1x Sportcomplex De Boskamp EMMELOORD          Sportlaan 87D, 8302 AX Emmeloord                   manual
+   1x Sportpark Daalseweide MAARSSEN             Sportparkweg 9, 3604 AW Maarssen                   manual
+   1x Sportpark Kortezwaag GORREDIJK             Mientewei 2, 8401 AA Gorredijk                     manual
+   1x Sportpark Larenstein BILTHOVEN             Tweelingen 142, 3721 WZ Bilthoven                  manual
+   1x Sportpark Orderbos APELDOORN               Sportpark Orderbos 5, 7313HN Apeldoorn             osm-tags
+   1x Sportpark Rielerenk DEVENTER               Nico Bolkesteinlaan 10, 7416SG Deventer            osm-tags
+   1x Stadshagen ZWOLLE                          Nijenhuislaan 2, 8043 WD Zwolle                    manual
+   1x Veld Wolderwijd ZEEWOLDE                   Horsterweg 202 A, 3893 AA Zeewolde                 manual
+
+
+AANTEKENINGEN BIJ DE HANDMATIGE REGELS
+====================================================================================================
+
+source 'manual' = het adres komt van de vereniging. De coordinaten zijn daaruit afgeleid
+met OpenStreetMap en gecontroleerd op postcode. Vier daarvan gaven een naam terug die het
+adres bevestigt: Erica Terpstrahal, Sparta Zwolle, De Treffer (ASVD) en de Terschuurse
+Boys op van de Bleekstraat 24.
+
+Twee adressen met een letter in het huisnummer kwamen alleen zonder die letter naar boven:
+  Emmeloord   Sportlaan 87D    -> gevonden via 'Sportlaan 87'; node 2719982478 IS 87D
+  Zeewolde    Horsterweg 202 A -> gevonden via 'Horsterweg 202'; postcode 3893 AA klopt,
+                                  de coordinaten zijn die van 202, niet van 202 A
+Beide liggen binnen enkele meters van het opgegeven adres, dus GEO is bruikbaar.
+
+De Zanderij: coordinaten wijzen naar het korfbalveld (OSM way/563472182), het adres is dat
+van Sporthal Dindoa. Bevestigd door de vereniging op 23-08-2026.
+
+Terschuur: 'Overbeek' is als locatienaam gelezen en 'van de Bleekstraat 24' als straat.
+
+
+EEN LOCATIE WIJZIGEN OF TOEVOEGEN
+====================================================================================================
+
+1. Maak of open  ~/.config/dindoa/locations.json
+2. Sleutel = de locatienaam van de website, genormaliseerd: kleine letters, geen
+   interpunctie, enkele spaties. De sleutels staan in de kolom rechts hierboven.
+3. Velden:  name | address | lat/lon (0 = onbekend) | osm | source
+4. Half invullen is veilig. Een regel met uitsluitend lege velden geldt als ontbrekend.
+5. Controleren:  dindoa --list-locations
+
+Locaties die je niet noemt blijven uit de meegeleverde lijst komen.

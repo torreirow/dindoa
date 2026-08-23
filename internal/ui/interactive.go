@@ -21,6 +21,7 @@ const (
 type model struct {
 	state      state
 	err        error
+	programma  *scraper.Programma
 	categories []scraper.Category
 	teams      []scraper.Team
 	selected   int
@@ -29,6 +30,8 @@ type model struct {
 	selectedTeam     string
 	outputFile       string
 	matchCount       int
+	missing          map[string]int
+	userPath         string
 
 	fetcher *scraper.Fetcher
 	parser  *scraper.Parser
@@ -36,7 +39,7 @@ type model struct {
 
 // Init initializes the model
 func (m model) Init() tea.Cmd {
-	return fetchCategories(m.fetcher, m.parser)
+	return fetchProgramma(m.fetcher, m.parser)
 }
 
 // Update handles messages and updates the model
@@ -68,12 +71,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.handleEnter()
 		}
 
-	case categoriesMsg:
-		m.categories = msg.categories
+	case programmaMsg:
 		if msg.err != nil {
 			m.err = msg.err
 			m.state = stateError
 		} else {
+			m.programma = msg.programma
+			m.categories = msg.categories
 			m.state = stateCategorySelection
 			m.selected = 0
 		}
@@ -86,6 +90,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case doneMsg:
 		m.outputFile = msg.outputFile
 		m.matchCount = msg.matchCount
+		m.missing = msg.missing
+		m.userPath = msg.userPath
 		if msg.err != nil {
 			m.err = msg.err
 			m.state = stateError
@@ -101,7 +107,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	switch m.state {
 	case stateLoadingCategories:
-		return "Loading categories...\n"
+		return "Wedstrijdprogramma ophalen...\n"
 
 	case stateCategorySelection:
 		return m.viewCategorySelection()
@@ -137,7 +143,7 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 		if m.selected < len(m.teams) {
 			m.selectedTeam = m.teams[m.selected].Name
 			m.state = stateProcessing
-			return m, generateICS(m.selectedTeam)
+			return m, generateICS(m.programma, m.selectedTeam)
 		}
 
 	case stateDone, stateError:

@@ -7,16 +7,25 @@ import (
 	"time"
 
 	ics "github.com/arran4/golang-ical"
+	"github.com/torreirow/dindoa/internal/locations"
 	"github.com/torreirow/dindoa/internal/scraper"
 )
+
+// matchDuration is how long a match is assumed to last. A VEVENT with a
+// DATE-TIME DTSTART and no DTEND is zero seconds long per RFC 5545, which
+// calendar apps render as a moment rather than an appointment.
+const matchDuration = time.Hour
 
 // Generator handles ICS file creation
 type Generator struct {
 	timezone *time.Location
+	mapping  *locations.Mapping
 }
 
-// NewGenerator creates a new ICS generator
-func NewGenerator() (*Generator, error) {
+// NewGenerator creates a new ICS generator using the given location mapping.
+// The mapping may be nil, in which case every venue falls back to the string
+// published on the website.
+func NewGenerator(mapping *locations.Mapping) (*Generator, error) {
 	// Load Europe/Amsterdam timezone for proper CET/CEST handling
 	tz, err := time.LoadLocation("Europe/Amsterdam")
 	if err != nil {
@@ -25,95 +34,128 @@ func NewGenerator() (*Generator, error) {
 
 	return &Generator{
 		timezone: tz,
+		mapping:  mapping,
 	}, nil
 }
 
-// Generate creates an ICS file for the given matches
-func (g *Generator) Generate(teamName string, matches []scraper.Match, outputFile string) error {
-	// Create calendar
+// Generate creates an ICS file for the given matches and reports which venues
+// were not present in the location mapping, with the number of matches each
+// affects. A missing venue never stops generation.
+func (g *Generator) Generate(teamName string, matches []scraper.Match, outputFile string) (map[string]int, error) {
 	cal := ics.NewCalendar()
 	cal.SetVersion("2.0")
 	cal.SetProductId("-//Dindoa//Dindoa ICS Generator//NL")
 
-	// Add each match as an event
+	missing := map[string]int{}
 	for _, match := range matches {
-		event := g.createEvent(teamName, match)
-		cal.AddVEvent(event)
+		entry, found := g.resolve(match.Location)
+		if !found && match.Location != "" {
+			missing[match.Location]++
+		}
+		cal.AddVEvent(g.createEvent(teamName, match, entry, found))
 	}
 
-	// Write to file
-	if err := os.WriteFile(outputFile, []byte(cal.Serialize()), 0644); err != nil {
-		return fmt.Errorf("write ICS file: %w", err)
+	if err := os.WriteFile(outputFile, []byte(cal.Serialize()), 0o644); err != nil {
+		return missing, fmt.Errorf("write ICS file: %w", err)
 	}
 
-	return nil
+	return missing, nil
+}
+
+func (g *Generator) resolve(venue string) (locations.Entry, bool) {
+	if g.mapping == nil || venue == "" {
+		return locations.Entry{}, false
+	}
+	return g.mapping.Lookup(venue)
 }
 
 // createEvent creates an ICS event for a match
-func (g *Generator) createEvent(teamName string, match scraper.Match) *ics.VEvent {
+func (g *Generator) createEvent(teamName string, match scraper.Match, entry locations.Entry, found bool) *ics.VEvent {
 	event := ics.NewEvent(g.generateUID(teamName, match))
 
-	// Set timestamp
 	event.SetDtStampTime(time.Now())
 
-	// Parse match time in Europe/Amsterdam timezone
-	dateTime := g.parseMatchDateTime(match)
-	event.SetStartAt(dateTime)
+	start := g.parseMatchDateTime(match)
+	event.SetStartAt(start)
+	event.SetEndAt(start.Add(matchDuration))
 
-	// Set summary (title)
-	title := g.formatTitle(teamName, match)
-	event.SetSummary(title)
+	event.SetSummary(g.formatTitle(teamName, match))
+	event.SetLocation(formatLocation(match.Location, entry, found))
+	event.SetDescription(g.formatDescription(match, entry, found))
 
-	// Set location
-	event.SetLocation(match.Location)
-
-	// Set description
-	desc := g.formatDescription(match)
-	event.SetDescription(desc)
+	if found && entry.HasCoordinates() {
+		event.SetGeo(entry.Lat, entry.Lon)
+	}
+	if match.Colour != "" {
+		event.AddProperty(ics.ComponentPropertyCategories, match.Colour)
+	}
 
 	return event
 }
 
-// generateUID creates a unique identifier for the event
+// formatLocation keeps the readable venue name from the website and appends the
+// mapped address. The published name is never replaced, so information from the
+// website cannot be lost.
+func formatLocation(venue string, entry locations.Entry, found bool) string {
+	if !found {
+		return venue
+	}
+
+	name := entry.Name
+	if name == "" {
+		name = venue
+	}
+	if entry.Address == "" {
+		return name
+	}
+	return name + ", " + entry.Address
+}
+
+// generateUID creates an identifier that stays stable when a match is moved to
+// a different kick-off time, so regenerating the calendar updates the existing
+// event instead of adding a second one.
 func (g *Generator) generateUID(teamName string, match scraper.Match) string {
-	slug := scraper.NormalizeTeamName(teamName)
-	dateStr := match.Date.Format("2006-01-02")
-	timeStr := strings.ReplaceAll(match.Time, ":", "")
-	return fmt.Sprintf("%s-%s-%s@dindoa.nl", slug, dateStr, timeStr)
+	return fmt.Sprintf("%s-%s-%s@dindoa.nl",
+		scraper.TeamSlug(teamName),
+		match.Date.Format("2006-01-02"),
+		scraper.TeamSlug(match.Opponent()),
+	)
 }
 
 // formatTitle formats the event title based on home/away status
 func (g *Generator) formatTitle(teamName string, match scraper.Match) string {
 	if match.IsHome {
-		// Home match: "Dindoa J3 - ASVD J1"
 		return fmt.Sprintf("%s - %s", teamName, match.Away)
 	}
-	// Away match: "ASVD J1 - Dindoa J3"
 	return fmt.Sprintf("%s - %s", match.Home, teamName)
 }
 
 // formatDescription creates the event description
-func (g *Generator) formatDescription(match scraper.Match) string {
+func (g *Generator) formatDescription(match scraper.Match, entry locations.Entry, found bool) string {
 	matchType := "Uitwedstrijd"
 	if match.IsHome {
 		matchType = "Thuiswedstrijd"
 	}
-	opponent := match.Away
-	if match.IsHome {
-		opponent = match.Away
-	} else {
-		opponent = match.Home
+
+	lines := []string{fmt.Sprintf("%s tegen %s", matchType, match.Opponent())}
+	if match.Colour != "" {
+		lines = append(lines, "Kleur: "+match.Colour)
 	}
-	return fmt.Sprintf("%s tegen %s", matchType, opponent)
+	if match.Referee != "" {
+		lines = append(lines, "Scheidsrechter: "+match.Referee)
+	}
+	if !found && match.Location != "" {
+		lines = append(lines, "Locatie niet in de adressenlijst; alleen de naam van de website is bekend.")
+	}
+	return strings.Join(lines, "\n")
 }
 
-// parseMatchDateTime combines date and time into a single time.Time in Europe/Amsterdam timezone
+// parseMatchDateTime combines date and time into a single time.Time in
+// Europe/Amsterdam timezone.
 func (g *Generator) parseMatchDateTime(match scraper.Match) time.Time {
-	// Parse time (HH:MM format)
 	var hour, minute int
 	fmt.Sscanf(match.Time, "%d:%d", &hour, &minute)
 
-	// Create datetime in Europe/Amsterdam timezone
 	return time.Date(
 		match.Date.Year(),
 		match.Date.Month(),
@@ -128,6 +170,5 @@ func (g *Generator) parseMatchDateTime(match scraper.Match) time.Time {
 
 // DefaultOutputFilename generates a default output filename based on team name
 func DefaultOutputFilename(teamName string) string {
-	slug := scraper.NormalizeTeamName(teamName)
-	return fmt.Sprintf("%s.ics", slug)
+	return fmt.Sprintf("%s.ics", scraper.TeamSlug(teamName))
 }
