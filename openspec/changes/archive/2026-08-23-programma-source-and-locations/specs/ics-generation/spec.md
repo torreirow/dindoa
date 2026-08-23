@@ -1,23 +1,5 @@
 ## MODIFIED Requirements
 
-### Requirement: Include geocoded location in events
-
-The system SHALL use the LOCATION field to carry both the venue name as published on the website and the mapped address, and SHALL NOT replace the published venue name with a looked-up address.
-
-#### Scenario: Known location
-
-- **WHEN** a location is present in the location mapping
-- **THEN** event LOCATION field contains the readable venue name followed by the address (e.g., "De Zanderij (Dindoa), Watervalweg 170, 3853 PT Ermelo")
-
-#### Scenario: Known location without a house number
-
-- **WHEN** a mapped address is only precise to street level
-- **THEN** event LOCATION field still contains the readable venue name and the street-level address, and navigation remains possible through the coordinates
-
-#### Scenario: Unknown location
-
-- **WHEN** a location is not present in the location mapping
-- **THEN** event LOCATION field contains the original venue name from the website unchanged
 
 ### Requirement: Generate unique event UIDs
 
@@ -64,6 +46,25 @@ The system SHALL include proper ICS timestamps for event creation, start and end
 
 ## ADDED Requirements
 
+### Requirement: Include venue name and address in events
+
+The system SHALL use the LOCATION field to carry both the venue name as published on the website and the mapped address, and SHALL NOT replace the published venue name with a looked-up address.
+
+#### Scenario: Known location
+
+- **WHEN** a location is present in the location mapping
+- **THEN** event LOCATION field contains the readable venue name followed by the address (e.g., "De Zanderij (Dindoa), Watervalweg 170, 3853 PT Ermelo")
+
+#### Scenario: Known location without a house number
+
+- **WHEN** a mapped address is only precise to street level
+- **THEN** event LOCATION field still contains the readable venue name and the street-level address, and navigation remains possible through the coordinates
+
+#### Scenario: Unknown location
+
+- **WHEN** a location is not present in the location mapping
+- **THEN** event LOCATION field contains the original venue name from the website unchanged
+
 ### Requirement: Include coordinates in events
 
 The system SHALL include the geographic coordinates of a match location in the event when those coordinates are known, so that calendar applications can offer map display and route planning.
@@ -91,3 +92,11 @@ The system SHALL record the colour category of the team in the event, so that th
 
 - **WHEN** generating events for a senior, midweek or under-age team whose matches carry no colour
 - **THEN** the events omit the category and remain valid
+
+## REMOVED Requirements
+
+### Requirement: Include geocoded location in events
+
+**Reason**: Deze requirement schreef voor dat het LOCATION-veld het volledige adres uit de geocoding bevat. Dat was precies de plek waar informatie verloren ging: de code overschreef de leesbare locatienaam van de website met de `display_name` van Nominatim, en bij een geslaagde maar verkeerde treffer werd een correcte naam vervangen door een verkeerd adres — voor `Het Slingerbos HARDERWIJK` 702 meter naast de werkelijke locatie. De scenario's verwijzen naar geslaagde en mislukte geocoding, een mechanisme dat niet meer bestaat.
+
+**Migration**: Vervangen door "Include venue name and address in events". LOCATION houdt nu de naam van de website en zet het adres uit de locatie-mapping erbij; coördinaten gaan naar GEO. Er is geen actie nodig van gebruikers.
