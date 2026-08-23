@@ -49,20 +49,20 @@
       "source": "manual"
     },
     "sportcomplex de voorde voorthuizen": {
-      "address": "Jan de Jagerweg, 3781 BS Voorthuizen",
-      "lat": 52.1869713,
-      "lon": 5.6196814,
+      "address": "Jan de Jagerweg 50, 3781 BS Voorthuizen",
+      "lat": 52.186594,
+      "lon": 5.6189435,
       "name": "Sportcomplex De Voorde",
-      "osm": "way/1036799967",
-      "source": "osm-reverse"
+      "osm": "node/2720499088",
+      "source": "manual"
     },
     "sportcomplex sportlaan drachten": {
-      "address": "Zuiderhogeweg, 9204 WJ Drachten",
-      "lat": 53.0920403,
-      "lon": 6.0857188,
+      "address": "Sportlaan 10, 9203 NW Drachten",
+      "lat": 53.0920082,
+      "lon": 6.08568,
       "name": "Sportcomplex Sportlaan",
-      "osm": "node/4458874048",
-      "source": "osm-reverse"
+      "osm": "node/2948624296",
+      "source": "manual"
     },
     "sportpark daalseweide maarssen": {
       "address": "Sportparkweg 9, 3604 AW Maarssen",
@@ -73,12 +73,12 @@
       "source": "manual"
     },
     "sportpark de eikelhof bennekom": {
-      "address": "Kierkamperweg, 6721 TG Bennekom",
-      "lat": 51.9962278,
-      "lon": 5.6648832,
+      "address": "Achterstraat 7, 6721 VM Bennekom",
+      "lat": 51.995068,
+      "lon": 5.6674738,
       "name": "Sportpark De Eikelhof",
-      "osm": "way/1232272778",
-      "source": "osm-reverse"
+      "osm": "node/13572368729",
+      "source": "manual"
     },
     "sportpark de grift woudenberg": {
       "address": "John F. Kennedylaan 116, 3931 XM Woudenberg",
@@ -89,20 +89,20 @@
       "source": "osm-reverse"
     },
     "sportpark de groene velden veenendaal": {
-      "address": "Groene Velden, 3902 HA Veenendaal",
-      "lat": 52.0175228,
-      "lon": 5.5674933,
+      "address": "Groeneveldselaan 15, 3902 HA Veenendaal",
+      "lat": 52.0182834,
+      "lon": 5.5703023,
       "name": "Sportpark De Groene Velden",
-      "osm": "way/64440254",
-      "source": "osm-reverse"
+      "osm": "node/792589595",
+      "source": "manual"
     },
     "sportpark de marslanden zwolle": {
-      "address": "Primulapad, 8013 XH Zwolle",
-      "lat": 52.5009627,
-      "lon": 6.1192519,
+      "address": "Hyacinthstraat 66, 8013 XZ Zwolle",
+      "lat": 52.5024372,
+      "lon": 6.1187005,
       "name": "Sportpark De Marslanden",
-      "osm": "way/51909531",
-      "source": "osm-reverse"
+      "osm": "node/5073992853",
+      "source": "manual"
     },
     "sportpark de maten kampen": {
       "address": "De Maten 4, 8265 VA Kampen",
@@ -113,12 +113,12 @@
       "source": "osm-reverse"
     },
     "sportpark de wiltsangh nunspeet": {
-      "address": "Sportlaan, 8072 RB Nunspeet",
-      "lat": 52.3850685,
-      "lon": 5.8110348,
+      "address": "Sportlaan 1, 8072 CA Nunspeet",
+      "lat": 52.3828493,
+      "lon": 5.8106389,
       "name": "Sportpark De Wiltsangh",
-      "osm": "way/502181306",
-      "source": "osm-reverse"
+      "osm": "node/2877884180",
+      "source": "manual"
     },
     "sportpark de woerd driebergen rijsenburg": {
       "address": "Hoge Woerd, 3972 KD Driebergen-Rijsenburg",
@@ -137,12 +137,12 @@
       "source": "manual"
     },
     "sportpark hagenbroek kampen": {
-      "address": "Beneluxweg, 8264 DX Kampen",
-      "lat": 52.5570256,
-      "lon": 5.9004685,
+      "address": "Hilbert van Dijkstraat 5, 8264 PB Kampen",
+      "lat": 52.5573528,
+      "lon": 5.8996065,
       "name": "Sportpark Hagenbroek",
-      "osm": "way/1274064607",
-      "source": "osm-reverse"
+      "osm": "node/2731963138",
+      "source": "manual"
     },
     "sportpark kortezwaag gorredijk": {
       "address": "Mientewei 2, 8401 AA Gorredijk",
@@ -185,12 +185,12 @@
       "source": "osm-reverse"
     },
     "sportpark oosterbos barneveld": {
-      "address": "Wethouder Rebellaan, 3771 XL Barneveld",
-      "lat": 52.1503183,
-      "lon": 5.5773096,
+      "address": "Wethouder Rebellaan 138, 3771 XL Barneveld",
+      "lat": 52.1497745,
+      "lon": 5.5785037,
       "name": "Sportpark Oosterbos",
-      "osm": "way/635399990",
-      "source": "osm-reverse"
+      "osm": "node/2636308835",
+      "source": "manual"
     },
     "sportpark oosterhof vaassen": {
       "address": "Zichtstede 16, 8171NB Vaassen",
@@ -217,12 +217,12 @@
       "source": "manual"
     },
     "sportpark putter eng putten": {
-      "address": "Halvinkhuizerweg, 3882 LA Putten",
-      "lat": 52.2501989,
-      "lon": 5.5943701,
+      "address": "Halvinkhuizerweg 109, 3882 LA Putten",
+      "lat": 52.2455151,
+      "lon": 5.5960916,
       "name": "Sportpark Putter Eng",
-      "osm": "way/502180076",
-      "source": "osm-reverse"
+      "osm": "way/6968839",
+      "source": "manual"
     },
     "sportpark rielerenk deventer": {
       "address": "Nico Bolkesteinlaan 10, 7416SG Deventer",
@@ -265,12 +265,12 @@
       "source": "manual"
     },
     "veld mia amersfoort": {
-      "address": "Schothorsterlaan, 3822 NB Amersfoort",
-      "lat": 52.1770104,
-      "lon": 5.3802859,
+      "address": "Schothorsterlaan 5, 3822 NB Amersfoort",
+      "lat": 52.1769215,
+      "lon": 5.3803584,
       "name": "Veld MIA",
-      "osm": "node/10169030052",
-      "source": "osm-reverse"
+      "osm": "node/2686782376",
+      "source": "manual"
     },
     "veld wolderwijd zeewolde": {
       "address": "Horsterweg 202 A, 3893 AA Zeewolde",
