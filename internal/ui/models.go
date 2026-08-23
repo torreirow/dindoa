@@ -90,6 +90,9 @@ func (m model) viewCategorySelection() string {
 	var b strings.Builder
 
 	b.WriteString("Dindoa ICS Generator\n\n")
+	if m.notice != "" {
+		b.WriteString(m.notice + "\n\n")
+	}
 	b.WriteString("Selecteer categorie:\n\n")
 
 	for i, cat := range m.categories {

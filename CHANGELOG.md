@@ -3,6 +3,15 @@
 
 ## NEXT VERSION
 
+### Fixed
+
+- **`--category` zonder `--list-teams`**: Dit startte de help in plaats van de interactieve modus,
+  terwijl de specificatie voorschrijft dat de categorie dan voorgeselecteerd wordt. Nu kom je met
+  `dindoa --category rood` direct in de teamlijst van Rood. Bestaat de categorie niet, dan verschijnt
+  het gewone keuzemenu met een melding erboven in plaats van een doodlopende foutmelding. Ook
+  `dindoa start --category rood` werkt zo. Deze afwijking bestond al vóór de overgang naar het
+  wedstrijdprogramma als bron.
+
 ### Added
 
 - **`SEQUENCE` in ICS-events**: Elk event krijgt een revisienummer dat bij elke keer genereren
