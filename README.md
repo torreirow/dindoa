@@ -322,6 +322,7 @@ Gegenereerde ICS bestanden bevatten:
 - **Coördinaten**: `GEO` wanneer bekend, zodat je agenda-app kaartweergave en routeplanning kan bieden
 - **Categorie**: `CATEGORIES` met de kleur van het team (Rood, Oranje, Geel, Groen, Blauw)
 - **UID**: Stabiele identifier per wedstrijd, opgebouwd uit team, datum en tegenstander. Wordt een wedstrijd naar een andere aanvangstijd verzet, dan **werkt** een nieuwe import het bestaande item bij in plaats van er een tweede naast te zetten
+- **SEQUENCE**: Revisienummer dat bij elke keer genereren oploopt, zodat een agenda-app die revisies bijhoudt een nieuw bestand als nieuwer herkent. De waarde hoort bij de *uitgave*, niet bij de individuele wedstrijd: alle events in één bestand hebben dezelfde waarde, en die loopt ook op als er niets veranderd is
 
 </details>
 
