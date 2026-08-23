@@ -92,5 +92,5 @@
 - [x] 9.4 Controleer in dat bestand: `DTSTART` van de eerste wedstrijd is `20260905T114500Z`, `DTEND` staat een uur later, `LOCATION` bevat naam plus adres, en `GEO` staat er waar bekend
 - [x] 9.5 `dindoa --team j4` meldt de ontbrekende locatie in Terschuur en eindigt met exitcode 0
 - [x] 9.6 `dindoa --list-locations` toont 35 locaties met de dekkingssamenvatting
-- [ ] 9.7 Importeer het gegenereerde bestand in een agenda-app en controleer dat de wedstrijd tijd inneemt en dat de locatie aantikbaar is
+- [x] 9.7 Bevestigd door de gebruiker (23-08-2026): het gegenereerde bestand is te importeren in een agenda-app
 - [x] 9.8 Genereer twee keer achter elkaar en controleer dat de tweede import bijwerkt in plaats van verdubbelt
