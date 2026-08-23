@@ -68,7 +68,7 @@
 - [x] 7.1 Neem de 23 reeds opgezochte locaties op in het meegeleverde bestand, met OSM-referentie en bron per regel
 - [x] 7.2 Bevestigd door de gebruiker (23-08-2026): Watervalweg 170, 3853 PT Ermelo. Kandidaten waren: OSM heeft drie kandidaten binnen 350 meter — het naamloze `sport=korfball`-veld `way/563472182`, `Sporthal Dindoa` `way/285497494` (Watervalweg 170) en het gemeentelijke `Sporthallen Zanderij` `node/12449716882` (Oude Telgterweg 203). Dit raakt 105 van de 210 wedstrijden
 - [x] 7.3 Alle 12 aangevuld met adressen van de vereniging (23-08-2026); coordinaten afgeleid en op postcode gecontroleerd. Lijst C is leeg: 35/35 locaties, 210/210 wedstrijden
-- [ ] 7.4 Controleer de 11 regels die alleen straatniveau hebben en vul een huisnummer aan waar bekend (optioneel: GEO levert de precisie al)
+- [x] 7.4 10 van de 11 aangevuld met huisnummer door de vereniging (23-08-2026); bij 7 daarvan ook straat of postcode gecorrigeerd, coordinaten herbepaald en op postcode gecontroleerd. Sportpark De Woerd blijft op straatniveau: huisnummer niet vastgesteld
 - [x] 7.5 Verwijder de annotatievelden die per seizoen verlopen uit het uitgeleverde bestand en houd de bronverwijzing
 
 ## 8. Documentatie
