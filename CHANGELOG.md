@@ -3,6 +3,58 @@
 
 ## NEXT VERSION
 
+### Changed
+
+- **Wedstrijdprogramma als bron**: Wedstrijden, teams, categorieën en kleuren komen nu uit
+  `dindoa.nl/ws/competitie-programma/` in plaats van uit de teampagina's en de teamsoverzichtspagina.
+  Die pagina's zijn voor het seizoen 2026/2027 niet meer gevuld met wedstrijddata, waardoor de tool
+  geen wedstrijden meer vond en de lijstcommando's met een parse-fout afbraken. Eén pagina levert nu
+  alles, inclusief de kleur per team.
+  - Datum komt uit de kop boven elke tabel; die bevat geen jaartal, dus het seizoen wordt afgeleid
+    en gecontroleerd op de dag van de week (korfbal speelt zaterdag en woensdag)
+  - Teams worden op volledige naam gefilterd. `Dindoa J1` is een prefix van `J10` t/m `J19`, dus
+    benaderend matchen leverde 66 wedstrijden op in plaats van 6
+  - Onverwachte tabelopmaak geeft nu een duidelijke fout in plaats van stil nul wedstrijden
+- **Adressen uit een meegeleverde lijst**: De geocoding tijdens het genereren is vervangen door een
+  adressenlijst die met de binary wordt meegeleverd. Genereren doet nu precies één netwerkverzoek
+  en heeft geen wachttijd meer.
+- **Locatie in het ICS-bestand**: `LOCATION` bevat nu de naam van de website **plus** het adres. De
+  naam werd voorheen overschreven met het zoekresultaat, waardoor een leesbare locatienaam kon
+  verdwijnen ten gunste van een verkeerd adres.
+- **Stabiele UID**: De UID bevat niet langer de aanvangstijd, maar team, datum en tegenstander. Een
+  verzette wedstrijd werkt daardoor het bestaande agenda-item bij in plaats van er een tweede naast
+  te zetten. **Verwijder een eerder geïmporteerde Dindoa-agenda eenmalig voordat je opnieuw
+  importeert.**
+
+### Added
+
+- **`--list-locations`**: Toont alle speellocaties uit het wedstrijdprogramma met hun adresstatus en
+  het aantal wedstrijden per locatie, gesorteerd op impact. Voor ontbrekende locaties volgt een
+  JSON-fragment om in je eigen adressenlijst te plakken.
+- **Eigen adressenlijst**: Een optioneel bestand in de configmap (`~/.config/dindoa/locations.json`
+  op Linux) overschrijft en vult de meegeleverde lijst aan, **per locatie**. Locaties die je niet
+  noemt blijven gewoon werken.
+- **`DTEND` in ICS-events**: Wedstrijden duren standaard een uur. Voorheen had een event alleen
+  `DTSTART` en was het volgens RFC 5545 nul seconden lang.
+- **`GEO` in ICS-events**: Coördinaten worden meegegeven wanneer bekend, zodat agenda-apps
+  kaartweergave en routeplanning kunnen bieden.
+- **`CATEGORIES` in ICS-events**: De kleur van het team (Rood, Oranje, Geel, Groen, Blauw) wordt
+  vastgelegd.
+- **Scheidsrechter in de omschrijving**: Wordt meegenomen wanneer die in het programma staat.
+
+### Fixed
+
+- **Stil falen bij het genereren**: `--team` schreef geen bestand en meldde niets bruikbaars wanneer
+  er geen wedstrijden werden gevonden. Een onbekend team geeft nu een fout met de beschikbare teams
+  en exitcode 1.
+- **Ontbrekende locatie blokkeert niet meer**: Het bestand wordt altijd geschreven met de naam van de
+  website, en de ontbrekende locaties worden expliciet gemeld met het aantal betrokken wedstrijden.
+  De exitcode blijft 0, want het bestand is geldig.
+- **Zelfvergiftigende cache verwijderd**: Mislukte zoekopdrachten werden onvoorwaardelijk gecached
+  met coördinaten 0,0 en zonder geldigheidsduur, waardoor de eerste run een fout resultaat permanent
+  vastzette. De cache in `~/.cache/dindoa/geocode.json` wordt niet meer gebruikt en kan verwijderd
+  worden.
+
 ## 0.1.3 - 13 Apr 2026
 
 ### Changed

@@ -11,8 +11,8 @@ Een CLI tool om wedstrijdschema's van Dindoa korfbal teams te exporteren naar IC
 
 - 🏐 Scrape wedstrijdschema's van dindoa.nl
 - 📅 Genereer ICS bestanden voor import in elke kalender app
-- 🗺️ Automatische geocoding van locaties via OpenStreetMap
-- 💾 Cross-platform caching voor snelle herhaalde uitvoeringen
+- 🗺️ Adressen en coördinaten van speellocaties uit een meegeleverde adressenlijst
+- 💾 Werkt zonder wachttijd: één pagina ophalen, verder geen netwerk
 - 🎨 Interactieve TUI of CLI flags voor scripting
 - 🌍 Cross-platform (Linux, macOS, Windows)
 
@@ -187,9 +187,11 @@ dindoa start
 ```
 
 Dit opent een terminal UI waar je:
-1. Een categorie selecteert (Senioren, Rood, Oranje, etc.)
+1. Een categorie selecteert (Rood, Oranje, Geel, Groen, Blauw, Senioren/Wedstrijdsport)
 2. Een team kiest
 3. Automatisch een ICS bestand wordt gegenereerd
+
+Locaties zonder adres worden in het afrondingsscherm gemeld, net als bij de CLI.
 
 </details>
 
@@ -204,14 +206,15 @@ dindoa --list-categories
 
 Voorbeeld output:
 ```
-Senioren
-Wedstrijdsport
-Rood
-Oranje
+Blauw
 Geel
 Groen
-Blauw
+Oranje
+Rood
+Senioren/Wedstrijdsport
 ```
+
+De kleuren komen uit de kolom `Kleur` van het wedstrijdprogramma. Senioren-, midweek- en U-teams hebben daar geen kleur en vallen samen onder `Senioren/Wedstrijdsport`.
 
 ### Lijst teams in een categorie
 
@@ -266,6 +269,39 @@ Team namen zijn flexibel:
 - `dindoa --team "Dindoa J3"` ✓
 - `dindoa --team "dindoa j3"` ✓
 
+Na het genereren meldt de tool welke locaties nog geen adres hebben. Het bestand wordt altijd geschreven en de exitcode blijft `0`:
+
+```
+✓ ICS file created: dindoa-j4.ics
+  Team:    Dindoa J4
+  Matches: 6
+
+⚠ 1 venue(s) not in the address list; the name from the website was used:
+    Sportpark Overbeek TERSCHUUR               (1 match(es))
+  Add them to ~/.config/dindoa/locations.json — run 'dindoa --list-locations' for a fragment to paste.
+```
+
+### Bekijk de speellocaties en hun adressen
+
+```bash
+dindoa --list-locations
+```
+
+Voorbeeld output:
+```
+Venues in the match programme (35 venues, 210 matches):
+
+  ✓  105x  De Zanderij (Dindoa) ERMELO                Watervalweg 170, 3853 PT Ermelo
+  ✓   15x  Het Slingerbos HARDERWIJK                  Slingerbos 1, 3844AC Harderwijk
+  ✗    5x  Veld ASVD DRONTEN                          — not in the address list
+  ...
+
+23/35 venues mapped (185/210 matches = 88%)
+Your address list: /home/je-naam/.config/dindoa/locations.json
+```
+
+Gesorteerd op aantal wedstrijden, dus de locatie die het meest oplevert staat bovenaan. Voor de ontbrekende locaties volgt een JSON-fragment om te plakken. Zie **Adressenlijst van speellocaties** hieronder.
+
 ### Custom output bestand
 
 ```bash
@@ -281,26 +317,67 @@ Gegenereerde ICS bestanden bevatten:
 
 - **Titel**: Correcte formatting (thuiswedstrijd: "Dindoa J3 - Tegenstander", uitwedstrijd: "Tegenstander - Dindoa J3")
 - **Datum/Tijd**: In Europe/Amsterdam timezone (automatisch CET/CEST)
-- **Locatie**: Volledig adres via OpenStreetMap geocoding (met fallback naar originele tekst)
-- **UID**: Unieke identifier per wedstrijd
+- **Locatie**: De naam van de locatie zoals dindoa.nl die publiceert, plus het adres uit de adressenlijst (`De Zanderij (Dindoa), Watervalweg 170, 3853 PT Ermelo`). Staat een locatie niet in de lijst, dan wordt de naam van de website ongewijzigd gebruikt
+- **Duur**: `DTSTART` en `DTEND`, standaard één uur, zodat de wedstrijd ruimte inneemt in je agenda
+- **Coördinaten**: `GEO` wanneer bekend, zodat je agenda-app kaartweergave en routeplanning kan bieden
+- **Categorie**: `CATEGORIES` met de kleur van het team (Rood, Oranje, Geel, Groen, Blauw)
+- **UID**: Stabiele identifier per wedstrijd, opgebouwd uit team, datum en tegenstander. Wordt een wedstrijd naar een andere aanvangstijd verzet, dan **werkt** een nieuwe import het bestaande item bij in plaats van er een tweede naast te zetten
 
 </details>
 
 <details>
-<summary><b>💾 Caching</b></summary>
+<summary><b>📍 Adressenlijst van speellocaties</b></summary>
 
-Geocoding resultaten worden gecached op:
+Het wedstrijdprogramma op dindoa.nl noemt locaties met een naam en een plaats, bijvoorbeeld `De Zanderij (Dindoa) ERMELO`. De tool zet die om naar een adres met coördinaten via een adressenlijst die **in de binary is meegeleverd**. Er is geen netwerk voor nodig en er is geen wachttijd.
 
-- **Linux**: `~/.cache/dindoa/geocode.json`
-- **macOS**: `~/Library/Caches/dindoa/geocode.json`
-- **Windows**: `%LOCALAPPDATA%\dindoa\cache\geocode.json`
+### Zelf een locatie toevoegen of corrigeren
 
-Dit zorgt voor:
-- Snellere herhaalde uitvoeringen
-- Minder belasting op OpenStreetMap Nominatim API
-- Handmatig editeerbare cache (JSON format)
+Je kunt de meegeleverde lijst per locatie overschrijven of aanvullen met een eigen bestand:
 
-De eerste run kan langzaam zijn door geocoding (1 request/seconde rate limit), maar daarna is het instant.
+| Platform | Pad van je eigen adressenlijst |
+|---|---|
+| **Linux** | `~/.config/dindoa/locations.json` |
+| **macOS** | `~/Library/Application Support/dindoa/locations.json` |
+| **Windows** | `%APPDATA%\dindoa\locations.json` |
+
+> **Let op:** dit is de **config**map, niet de cachemap. Een oudere versie van deze tool schreef een `geocode.json` in de cachemap (`~/.cache/dindoa/` op Linux). Dat bestand wordt niet meer gebruikt en kan verwijderd worden.
+
+Jouw bestand overschrijft de meegeleverde lijst **per locatie**. Locaties die je niet noemt blijven gewoon werken, dus je hoeft nooit de hele lijst te kopiëren.
+
+Begin met:
+
+```bash
+dindoa --list-locations
+```
+
+Dat toont alle locaties uit het wedstrijdprogramma, welke al een adres hebben, en hoeveel wedstrijden er aan elke locatie hangen. Voor de locaties die nog ontbreken krijg je een fragment dat je rechtstreeks in je eigen bestand kunt plakken:
+
+```json
+{
+  "version": 1,
+  "locations": {
+    "sportpark overbeek terschuur": {
+      "name": "Sportpark Overbeek",
+      "address": "Overbeeksestraat 1, 3784 XX Terschuur",
+      "lat": 52.1654,
+      "lon": 5.5195,
+      "osm": "way/123456789",
+      "source": "manual"
+    }
+  }
+}
+```
+
+| Veld | Betekenis |
+|---|---|
+| sleutel | De locatienaam van de website, genormaliseerd: kleine letters, zonder interpunctie, enkele spaties |
+| `name` | De leesbare naam die in je agenda komt |
+| `address` | Het adres. Mag ook alleen straatniveau zijn; `lat`/`lon` leveren dan de precisie |
+| `lat` / `lon` | Coördinaten. Laat op `0` staan als je ze niet weet |
+| `osm` | Optionele verwijzing naar het OpenStreetMap-object, zodat de regel later na te controleren is |
+| `source` | Waar de gegevens vandaan komen: `manual`, `osm-tags`, `osm-reverse` |
+
+Een locatie die nergens in de lijst staat blokkeert nooit: de ICS wordt gewoon gegenereerd met de naam van de website, en de tool meldt welke locaties ontbreken.
 
 </details>
 
@@ -369,20 +446,22 @@ done
 ## Troubleshooting
 
 <details>
-<summary><b>Geocoding faalt</b></summary>
+<summary><b>Een locatie heeft geen adres</b></summary>
 
-Als een locatie niet gevonden wordt door OpenStreetMap:
-- De originele locatie tekst wordt gebruikt als fallback
-- Er verschijnt een waarschuwing in de output
-- De ICS wordt nog steeds gegenereerd
-
-Je kunt de cache handmatig bewerken:
-```bash
-# Linux
-nano ~/.cache/dindoa/geocode.json
-
-# Pas het adres aan voor een specifieke locatie
 ```
+⚠ 1 venue(s) not in the address list; the name from the website was used:
+    Sportpark Overbeek TERSCHUUR               (1 match(es))
+```
+
+Dit is geen fout. De ICS is aangemaakt en geldig; de betreffende wedstrijd heeft alleen de locatienaam van de website als locatie, zonder adres en zonder coördinaten. De exitcode blijft `0`.
+
+Om het aan te vullen:
+
+```bash
+dindoa --list-locations
+```
+
+Dat geeft een JSON-fragment dat je in je eigen adressenlijst kunt plakken. Zie **Adressenlijst van speellocaties** hierboven.
 
 </details>
 
@@ -390,24 +469,52 @@ nano ~/.cache/dindoa/geocode.json
 <summary><b>Team niet gevonden</b></summary>
 
 ```
-Error: fetch team page: status 404
+Error: team "Dindoa J99" does not appear in the match programme.
+Available teams:
+  Dindoa 1
+  ...
 ```
 
-Mogelijke oorzaken:
-- Typo in team naam (probeer `--list-teams`)
-- Team bestaat niet (controleer dindoa.nl)
-- Website structuur veranderd
+De tool somt de beschikbare teams op. Mogelijke oorzaken:
+- Typo in de teamnaam
+- Het team komt (nog) niet voor in het gepubliceerde deel van het wedstrijdprogramma
 
 </details>
 
 <details>
-<summary><b>Geen wedstrijden</b></summary>
+<summary><b>Nog geen wedstrijden</b></summary>
 
 ```
-No matches found for this team
+Dindoa J3 has no matches in the published part of the programme.
 ```
 
-Dit team heeft (nog) geen geplande wedstrijden dit seizoen.
+Het wedstrijdprogramma op dindoa.nl wordt in blokken gepubliceerd, niet in één keer voor het hele seizoen. Loop je hier tegenaan, kijk dan later in het seizoen opnieuw.
+
+Om dezelfde reden is elk ICS-bestand een momentopname. Opnieuw genereren en importeren is veilig: de UID van een wedstrijd is stabiel, dus je agenda-app werkt bestaande items bij in plaats van ze te verdubbelen.
+
+> **Eenmalig bij het bijwerken vanaf v0.1.3 of ouder:** de opbouw van de UID is gewijzigd. Verwijder een eerder geïmporteerde Dindoa-agenda voordat je een nieuw bestand importeert, anders staan de oude en nieuwe items naast elkaar.
+
+</details>
+
+<details>
+<summary><b>Foutmelding over de opmaak van de pagina</b></summary>
+
+```
+Error: parse match programme (...): unexpected match table layout: expected columns [...]
+```
+
+De opmaak van het wedstrijdprogramma op dindoa.nl is gewijzigd. De tool geeft hier bewust een fout in plaats van stil nul wedstrijden op te leveren. Meld dit als issue.
+
+</details>
+
+<details>
+<summary><b>Foutmelding over het seizoensjaar</b></summary>
+
+```
+Error: could not establish the season year: ...
+```
+
+De datumkoppen op de pagina bevatten geen jaartal, dus de tool leidt het seizoen af en controleert dat op de dag van de week: korfbal speelt zaterdag en woensdag. Klopt dat patroon niet, dan is er iets mis met de systeemklok of met de pagina.
 
 </details>
 
@@ -420,7 +527,7 @@ Dit team heeft (nog) geen geplande wedstrijden dit seizoen.
   - golang-ical (ICS generatie)
   - xdg (cross-platform paths)
 - **Data source**: https://dindoa.nl/ws/
-- **Geocoding**: OpenStreetMap Nominatim (rate limited: 1 req/sec)
+- **Locaties**: meegeleverde adressenlijst (`locations.json`, via `go:embed`), te overschrijven met een eigen bestand in de configmap
 - **Platforms**: Linux, macOS, Windows (amd64 & arm64)
 - **Package managers**: Nix, Go modules
 
