@@ -48,7 +48,49 @@ The system SHALL extract Dindoa team names from the match programme page, organi
 - **WHEN** the programme contains opponent teams alongside Dindoa teams
 - **THEN** system lists only the Dindoa teams
 
-### Requirement: Scrape match schedule for team
+
+### Requirement: Normalize team names to URL slugs
+
+The system SHALL convert user-provided team names to the display name used in the match programme, and SHALL match that display name exactly against the programme's team columns. The system SHALL also derive a slug form for use as a default output filename.
+
+#### Scenario: Short team name normalization
+
+- **WHEN** user provides "j3" as team name
+- **THEN** system resolves it to the display name "Dindoa J3"
+
+#### Scenario: Full team name normalization
+
+- **WHEN** user provides "Dindoa J3" or "dindoa j3" as team name
+- **THEN** system resolves it to the display name "Dindoa J3"
+
+#### Scenario: Case-insensitive handling
+
+- **WHEN** user provides team name in any case (e.g., "J3", "j3", "DINDOA J3")
+- **THEN** system resolves it to the display name "Dindoa J3"
+
+#### Scenario: Exact matching prevents cross-team leakage
+
+- **WHEN** the user selects "Dindoa J1" and the programme also contains "Dindoa J10" through "Dindoa J19"
+- **THEN** system returns only the matches of "Dindoa J1"
+
+#### Scenario: Opponent with the same team code is excluded
+
+- **WHEN** the user selects "Dindoa J4" and the programme contains opponents named "Revival J4" and "Unitas/Perspectief J4"
+- **THEN** system returns only the matches in which "Dindoa J4" itself plays
+
+#### Scenario: Senior team is distinct from a junior team
+
+- **WHEN** the user selects "Dindoa 4"
+- **THEN** system returns the matches of the senior team and not those of "Dindoa J4"
+
+#### Scenario: Slug for the default filename
+
+- **WHEN** the system needs a default output filename for team "Dindoa J3"
+- **THEN** system derives the slug "dindoa-j3"
+
+## ADDED Requirements
+
+### Requirement: Scrape match schedule from the match programme
 
 The system SHALL parse the match programme page to extract all matches for a given Dindoa team, taking the date from the heading above each table and the remaining fields from the table row.
 
@@ -104,41 +146,10 @@ The system SHALL parse the match programme page to extract all matches for a giv
 - **WHEN** the programme page loads but the table headers do not match the expected columns
 - **THEN** system returns an error identifying the unexpected layout rather than returning an empty match list
 
-### Requirement: Normalize team names to URL slugs
+## REMOVED Requirements
 
-The system SHALL convert user-provided team names to the display name used in the match programme, and SHALL match that display name exactly against the programme's team columns. The system SHALL also derive a slug form for use as a default output filename.
+### Requirement: Scrape match schedule for team
 
-#### Scenario: Short team name normalization
+**Reason**: Deze requirement beschreef het ophalen van wedstrijden uit de tabel op een teampagina. Die pagina bevat voor seizoen 2026/2027 alleen een trainingstabel (`Dag | Tijd | Veld | Trainer(s)`) en geen wedstrijden, waardoor `--team` een leeg resultaat gaf zonder foutmelding. De teampagina heeft daarnaast geen kleur- of scheidsrechterkolom, en de slug is niet betrouwbaar: `/ws/dindoa-j4/` verwijst met een HTTP 301 door naar `/ws/dindoa-j4-3/`. De scenario's over het ophalen en parsen van een teampagina beschrijven dus gedrag dat niet meer bestaat.
 
-- **WHEN** user provides "j3" as team name
-- **THEN** system resolves it to the display name "Dindoa J3"
-
-#### Scenario: Full team name normalization
-
-- **WHEN** user provides "Dindoa J3" or "dindoa j3" as team name
-- **THEN** system resolves it to the display name "Dindoa J3"
-
-#### Scenario: Case-insensitive handling
-
-- **WHEN** user provides team name in any case (e.g., "J3", "j3", "DINDOA J3")
-- **THEN** system resolves it to the display name "Dindoa J3"
-
-#### Scenario: Exact matching prevents cross-team leakage
-
-- **WHEN** the user selects "Dindoa J1" and the programme also contains "Dindoa J10" through "Dindoa J19"
-- **THEN** system returns only the matches of "Dindoa J1"
-
-#### Scenario: Opponent with the same team code is excluded
-
-- **WHEN** the user selects "Dindoa J4" and the programme contains opponents named "Revival J4" and "Unitas/Perspectief J4"
-- **THEN** system returns only the matches in which "Dindoa J4" itself plays
-
-#### Scenario: Senior team is distinct from a junior team
-
-- **WHEN** the user selects "Dindoa 4"
-- **THEN** system returns the matches of the senior team and not those of "Dindoa J4"
-
-#### Scenario: Slug for the default filename
-
-- **WHEN** the system needs a default output filename for team "Dindoa J3"
-- **THEN** system derives the slug "dindoa-j3"
+**Migration**: Vervangen door "Scrape match schedule from the match programme", die dezelfde wedstrijden uit `/ws/competitie-programma/` haalt en daarnaast kleur en scheidsrechter oplevert. Er is geen actie nodig van gebruikers.
