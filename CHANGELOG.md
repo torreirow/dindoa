@@ -3,6 +3,25 @@
 
 ## NEXT VERSION
 
+### Added
+
+- **`--update-locations`**: Vult je eigen adressenlijst (`~/.config/dindoa/locations.json`) aan met
+  locaties uit het huidige programma die nog geen adres hebben. Zo hoef je bij een nieuw seizoen
+  niet op een release te wachten.
+  - Eerst de gecontroleerde lijst op de `main`-branch van de repository, daarna OpenStreetMap
+    (hooguit één verzoek per seconde). Alleen een sporthal of sportcentrum in de juiste plaats
+    telt; bij twijfel wordt niets ingevuld. Die regels krijgen `source: "osm-auto"`.
+  - Wat dan nog ontbreekt vraagt het commando in een terminal aan jou: straat, postcode en
+    woonplaats, opgezocht in OpenStreetMap, en anders desgewenst GPS-coördinaten. Ctrl+C of Ctrl+D
+    bewaart wat al is ingevoerd.
+  - Bestaande regels in je bestand worden nooit overschreven. Het bestand wordt atomair geschreven.
+  - Alleen dit commando gebruikt het netwerk voor adressen; een agenda genereren blijft offline.
+
+### Changed
+
+- **`--list-locations` markeert automatisch gevonden adressen** met `[osm-auto]`, zodat je ziet
+  welke je nog moet controleren, en wijst bij ontbrekende locaties naar `--update-locations`.
+
 ### Fixed
 
 - **Aanvangstijd werd stil verkeerd gelezen**: De tijdkolom werd met `fmt.Sscanf("%d:%d")` gelezen

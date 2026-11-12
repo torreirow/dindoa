@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+
+	"github.com/torreirow/dindoa/internal/useragent"
 )
 
 const (
 	baseURL      = "https://dindoa.nl/ws"
 	programmaURL = baseURL + "/competitie-programma/"
-	userAgent    = "Dindoa-ICS-Generator/1.0"
 	timeout      = 30 * time.Second
 )
 
@@ -36,7 +37,7 @@ func (f *Fetcher) FetchDocument(url string) (*goquery.Document, error) {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
-	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("User-Agent", useragent.Value)
 
 	resp, err := f.client.Do(req)
 	if err != nil {

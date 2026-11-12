@@ -286,7 +286,7 @@ Na het genereren meldt de tool welke locaties nog geen adres hebben. Het bestand
 
 ⚠ 1 venue(s) not in the address list; the name from the website was used:
     Sportpark Overbeek TERSCHUUR               (1 match(es))
-  Add them to ~/.config/dindoa/locations.json — run 'dindoa --list-locations' for a fragment to paste.
+  Run 'dindoa --update-locations' to look them up, or add them to ~/.config/dindoa/locations.json.
 ```
 
 ### Bekijk de speellocaties en hun adressen
@@ -384,9 +384,27 @@ Dat toont alle locaties uit het wedstrijdprogramma, welke al een adres hebben, e
 | `address` | Het adres. Mag ook alleen straatniveau zijn; `lat`/`lon` leveren dan de precisie |
 | `lat` / `lon` | Coördinaten. Laat op `0` staan als je ze niet weet |
 | `osm` | Optionele verwijzing naar het OpenStreetMap-object, zodat de regel later na te controleren is |
-| `source` | Waar de gegevens vandaan komen: `manual`, `osm-tags`, `osm-reverse` |
+| `source` | Waar de gegevens vandaan komen: `manual`, `osm-tags`, `osm-reverse`, `web`, `osm-auto` |
 
 Een locatie die nergens in de lijst staat blokkeert nooit: de ICS wordt gewoon gegenereerd met de naam van de website, en de tool meldt welke locaties ontbreken.
+
+### Ontbrekende locaties automatisch aanvullen
+
+Nieuwe locaties (bijvoorbeeld bij de start van het zaalseizoen) hoef je niet met de hand op te zoeken:
+
+```bash
+dindoa --update-locations
+```
+
+Dit is het enige commando dat voor adressen het netwerk gebruikt. Het vult je eigen bestand aan met locaties uit het huidige programma die nog geen adres hebben, in deze volgorde:
+
+1. **De gecontroleerde lijst in de repository** (de `main`-branch op GitHub). Wat daar inmiddels staat, krijg je zo zonder nieuwe release.
+2. **OpenStreetMap**, voor wat dan nog ontbreekt. Alleen een sporthal of sportcentrum in de juiste plaats telt; bij twijfel wordt niets ingevuld. Hooguit één verzoek per seconde, dus een volledige run duurt ruim een minuut. Deze regels krijgen `"source": "osm-auto"`.
+3. **Jijzelf**, als het commando in een terminal draait. Per ontbrekende locatie vraagt het om straat met huisnummer, postcode en woonplaats en zoekt dat adres op in OpenStreetMap. Lukt dat niet, dan kun je GPS-coördinaten invoeren (`52.2870, 5.5965`). Enter bij de straat slaat een locatie over; Ctrl+C of Ctrl+D stopt en bewaart wat je al had ingevoerd. Deze regels krijgen `"source": "manual"`.
+
+Regels die al in je bestand staan worden **nooit** overschreven: een eigen correctie gaat altijd voor.
+
+**Controleer `osm-auto`-regels.** Ze zijn op naam gevonden en kunnen een andere hal met een vergelijkbare naam zijn. `dindoa --list-locations` zet `[osm-auto]` achter die regels. Klopt er een niet, pas het adres en de coördinaten aan en zet `source` op `manual`, of verwijder de regel en draai `--update-locations` opnieuw.
 
 </details>
 

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"math"
 	"os"
+	"os/signal"
 	"sort"
 	"strings"
 	"time"
@@ -21,6 +23,7 @@ var (
 	listTeams      = flag.Bool("list-teams", false, "List teams in a category")
 	listAllTeams   = flag.Bool("list-all-teams", false, "List all teams sorted by category")
 	listLocations  = flag.Bool("list-locations", false, "List all venues with their address mapping status")
+	updateLocs     = flag.Bool("update-locations", false, "Add missing venues to your address list (uses the network)")
 	team           = flag.String("team", "", "Team to generate ICS for")
 	output         = flag.String("output", "", "Custom output filename")
 	help           = flag.Bool("help", false, "Show usage information")
@@ -36,6 +39,17 @@ func main() {
 	}
 
 	args := flag.Args()
+
+	// --update-locations writes a file; refuse to guess what a combination
+	// with another command was meant to do.
+	if *updateLocs {
+		if *team != "" || *output != "" || *category != "" || *listTeams ||
+			*listCategories || *listAllTeams || *listLocations || len(args) > 0 {
+			fmt.Fprintln(os.Stderr, "Error: --update-locations cannot be combined with other commands or flags")
+			os.Exit(2)
+		}
+		run(handleUpdateLocations)
+	}
 
 	if len(args) > 0 && args[0] == "start" {
 		p := ui.NewInteractiveApp(*category)
@@ -156,6 +170,51 @@ func handleListAllTeams() error {
 	return nil
 }
 
+// coverage is how far the mapping covers the venues in the programme.
+type coverage struct {
+	venues        []string // most matches first
+	counts        map[string]int
+	missing       []string // in the same order as venues
+	mappedVenues  int
+	mappedMatches int
+	totalMatches  int
+}
+
+func computeCoverage(prog *scraper.Programma, mapping *locations.Mapping) coverage {
+	c := coverage{counts: prog.LocationCounts()}
+	for v, n := range c.counts {
+		c.venues = append(c.venues, v)
+		c.totalMatches += n
+	}
+	// Most matches first, so the venue worth fixing shows up at the top.
+	sort.Slice(c.venues, func(i, j int) bool {
+		if c.counts[c.venues[i]] != c.counts[c.venues[j]] {
+			return c.counts[c.venues[i]] > c.counts[c.venues[j]]
+		}
+		return c.venues[i] < c.venues[j]
+	})
+	for _, v := range c.venues {
+		if _, ok := mapping.Lookup(v); ok {
+			c.mappedVenues++
+			c.mappedMatches += c.counts[v]
+			continue
+		}
+		c.missing = append(c.missing, v)
+	}
+	return c
+}
+
+// summary is the coverage line shared by --list-locations and --update-locations.
+func (c coverage) summary() string {
+	// Round down, so the summary never claims 100% while a venue is missing.
+	pct := 0.0
+	if c.totalMatches > 0 {
+		pct = math.Floor(100 * float64(c.mappedMatches) / float64(c.totalMatches))
+	}
+	return fmt.Sprintf("%d/%d venues mapped (%d/%d matches = %.0f%%)",
+		c.mappedVenues, len(c.venues), c.mappedMatches, c.totalMatches, pct)
+}
+
 func handleListLocations() error {
 	prog, err := loadProgramma()
 	if err != nil {
@@ -165,60 +224,173 @@ func handleListLocations() error {
 	if err != nil {
 		return err
 	}
+	c := computeCoverage(prog, mapping)
 
-	counts := prog.LocationCounts()
-	venues := make([]string, 0, len(counts))
-	total := 0
-	for v, n := range counts {
-		venues = append(venues, v)
-		total += n
-	}
-	// Most matches first, so the venue worth fixing shows up at the top.
-	sort.Slice(venues, func(i, j int) bool {
-		if counts[venues[i]] != counts[venues[j]] {
-			return counts[venues[i]] > counts[venues[j]]
-		}
-		return venues[i] < venues[j]
-	})
-
-	fmt.Printf("Venues in the match programme (%d venues, %d matches):\n\n", len(venues), total)
-
-	var missing []string
-	mappedVenues, mappedMatches := 0, 0
-	for _, v := range venues {
+	fmt.Printf("Venues in the match programme (%d venues, %d matches):\n\n", len(c.venues), c.totalMatches)
+	for _, v := range c.venues {
 		entry, ok := mapping.Lookup(v)
-		if ok {
-			mappedVenues++
-			mappedMatches += counts[v]
-			detail := entry.Address
-			if detail == "" {
-				detail = "(coordinates only)"
-			}
-			fmt.Printf("  ✓ %4dx  %-42s %s\n", counts[v], v, detail)
+		if !ok {
+			fmt.Printf("  ✗ %4dx  %-42s — not in the address list\n", c.counts[v], v)
 			continue
 		}
-		missing = append(missing, v)
-		fmt.Printf("  ✗ %4dx  %-42s — not in the address list\n", counts[v], v)
+		detail := entry.Address
+		if detail == "" {
+			detail = "(coordinates only)"
+		}
+		if entry.Source == "osm-auto" {
+			detail += "  [osm-auto]"
+		}
+		fmt.Printf("  ✓ %4dx  %-42s %s\n", c.counts[v], v, detail)
 	}
 
-	// Round down, so the summary never claims 100% while a venue is missing.
-	pct := 0.0
-	if total > 0 {
-		pct = math.Floor(100 * float64(mappedMatches) / float64(total))
-	}
-	fmt.Printf("\n%d/%d venues mapped (%d/%d matches = %.0f%%)\n",
-		mappedVenues, len(venues), mappedMatches, total, pct)
+	fmt.Printf("\n%s\n", c.summary())
 	fmt.Printf("Your address list: %s\n", mapping.UserPath())
 	if !mapping.UserFileLoaded {
 		fmt.Println("  (does not exist yet; create it to add or correct venues)")
 	}
 
-	if len(missing) > 0 {
-		fmt.Printf("\nPaste this into %s and fill in the blanks:\n\n%s\n",
-			mapping.UserPath(), locations.Skeleton(missing))
+	if len(c.missing) > 0 {
+		fmt.Printf("\nRun 'dindoa --update-locations' to look them up, or paste this into %s and fill in the blanks:\n\n%s\n",
+			mapping.UserPath(), locations.Skeleton(c.missing))
+	}
+	if hasOSMAuto(mapping, c.venues) {
+		fmt.Println("\n[osm-auto] entries were found in OpenStreetMap by name only; worth checking.")
 	}
 
 	return nil
+}
+
+func hasOSMAuto(mapping *locations.Mapping, venues []string) bool {
+	for _, v := range venues {
+		if e, ok := mapping.Lookup(v); ok && e.Source == "osm-auto" {
+			return true
+		}
+	}
+	return false
+}
+
+func handleUpdateLocations() error {
+	// Read the user's file first: if it is unreadable, stop before anything
+	// goes over the network.
+	userPath := locations.UserFilePath()
+	userFile, err := locations.ReadUserFile(userPath)
+	if err != nil {
+		return fmt.Errorf("%w\nFix or move that file, then run --update-locations again", err)
+	}
+
+	prog, err := loadProgramma()
+	if err != nil {
+		return err
+	}
+	mapping, err := loadMapping()
+	if err != nil {
+		return err
+	}
+	before := computeCoverage(prog, mapping)
+	if len(before.missing) == 0 {
+		fmt.Printf("Nothing to add: all %d venues in the programme have an address.\n", len(before.venues))
+		fmt.Println(before.summary())
+		return nil
+	}
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	fmt.Fprintf(os.Stderr, "%d venue(s) without an address. Checking the reviewed list in the repository...\n", len(before.missing))
+	osm := locations.NewNominatimSource()
+	osm.Progress = os.Stderr
+	repo := locations.NewRepoSource()
+	res := locations.Update(ctx, before.missing, userFile, repo, osm)
+
+	// Ask about whatever is still missing, but only when someone can answer.
+	var manual []locations.Outcome
+	if len(res.Missing) > 0 && ctx.Err() == nil && isTerminal(os.Stdin) && isTerminal(os.Stdout) {
+		fmt.Printf("\n%d venue(s) still have no address. Enter them by hand, or press Enter to skip one.\n", len(res.Missing))
+		d := &locations.Dialog{In: locations.NewLineReader(os.Stdin), Out: os.Stdout, Lookup: osm.LookupAddress}
+		var still []locations.Outcome
+		for i, o := range res.Missing {
+			if strings.HasPrefix(o.Reason, "your file has an empty entry") {
+				still = append(still, o)
+				continue
+			}
+			e, ok, err := d.Ask(ctx, o.Venue, before.counts[o.Venue])
+			if err != nil {
+				// Input ended or Ctrl+C: keep what was confirmed, ask no more.
+				fmt.Println("\nStopped; saving what was entered so far.")
+				still = append(still, res.Missing[i:]...)
+				break
+			}
+			if !ok {
+				o.Reason = "skipped"
+				still = append(still, o)
+				continue
+			}
+			userFile.Locations[o.Key] = e
+			o.Source, o.Entry, o.Reason = "entered by hand", e, ""
+			manual = append(manual, o)
+		}
+		res.Missing = still
+	}
+
+	added := len(res.Added) + len(manual)
+	if added > 0 {
+		if err := locations.WriteUserFile(userPath, userFile); err != nil {
+			return err
+		}
+	}
+
+	printUpdateReport(res, manual)
+
+	after := before
+	if added > 0 {
+		if m, err := locations.Load(); err == nil {
+			after = computeCoverage(prog, m)
+		}
+	}
+	fmt.Printf("\n%s\n", after.summary())
+	if added > 0 {
+		fmt.Printf("Saved %d venue(s) to %s\n", added, userPath)
+	} else {
+		fmt.Printf("Nothing saved; %s is unchanged.\n", userPath)
+	}
+	return nil
+}
+
+func printUpdateReport(res locations.Result, manual []locations.Outcome) {
+	for _, w := range res.Warnings {
+		fmt.Fprintf(os.Stderr, "Warning: %s\n", w)
+	}
+	block := func(title string, list []locations.Outcome) {
+		if len(list) == 0 {
+			return
+		}
+		fmt.Printf("\n%s (%d):\n", title, len(list))
+		for _, o := range list {
+			if o.Reason != "" {
+				fmt.Printf("  ✗ %-42s %s\n", o.Venue, o.Reason)
+				continue
+			}
+			fmt.Printf("  ✓ %-42s %s\n", o.Venue, o.Entry.Address)
+		}
+	}
+	var fromRepo, fromOSM []locations.Outcome
+	for _, o := range res.Added {
+		if o.Source == "repository" {
+			fromRepo = append(fromRepo, o)
+		} else {
+			fromOSM = append(fromOSM, o)
+		}
+	}
+	block("Added from the reviewed list in the repository", fromRepo)
+	block("Added from OpenStreetMap (source osm-auto; please check these)", fromOSM)
+	block("Entered by hand", manual)
+	block("Still missing", res.Missing)
+}
+
+// isTerminal reports whether f is an interactive terminal.
+func isTerminal(f *os.File) bool {
+	fi, err := f.Stat()
+	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
 
 func handleGenerateICS(teamInput, outputFile string) error {
@@ -294,7 +466,7 @@ func printMissingLocations(missing map[string]int, userPath string) {
 	for _, v := range venues {
 		fmt.Printf("    %-42s (%d match(es))\n", v, missing[v])
 	}
-	fmt.Printf("  Add them to %s — run 'dindoa --list-locations' for a fragment to paste.\n", userPath)
+	fmt.Printf("  Run 'dindoa --update-locations' to look them up, or add them to %s.\n", userPath)
 }
 
 func printUsage() {
@@ -308,6 +480,7 @@ func printUsage() {
 	fmt.Println("  dindoa --category <name>                  Interactive mode, category pre-selected")
 	fmt.Println("  dindoa --list-all-teams                   List all teams by category")
 	fmt.Println("  dindoa --list-locations                   List venues and their address status")
+	fmt.Println("  dindoa --update-locations                 Add missing venue addresses (uses the network)")
 	fmt.Println("  dindoa --team <name>                      Generate ICS for team")
 	fmt.Println("  dindoa --team <name> --output <file>      Generate ICS with custom filename")
 	fmt.Println("  dindoa --help                             Show this help message")
@@ -319,6 +492,7 @@ func printUsage() {
 	fmt.Println("  dindoa --category rood --list-teams       List teams in Rood category")
 	fmt.Println("  dindoa --category rood                    Pick a Rood team interactively")
 	fmt.Println("  dindoa --list-locations                   See which venues need an address")
+	fmt.Println("  dindoa --update-locations                 Fill your address list from the repository and OpenStreetMap")
 	fmt.Println()
 	fmt.Printf("Match data comes from %s\n", scraper.ProgrammaURL())
 	fmt.Printf("Venue addresses come from %s (optional; built-in list is used otherwise)\n",

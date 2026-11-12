@@ -5,6 +5,11 @@
 // Lookups never reach the network. A venue that is not in the mapping is
 // reported as missing so the caller can say so, rather than silently
 // substituting something that might be wrong.
+//
+// Only the Source implementations (RepoSource, NominatimSource) use the
+// network, and only the explicit update command calls them: Update adds the
+// venues they find to the user's file and never changes an entry already
+// there.
 package locations
 
 import (
@@ -63,8 +68,8 @@ func (e Entry) IsEmpty() bool {
 	return e.Name == "" && e.Address == "" && !e.HasCoordinates()
 }
 
-// file is the on-disk shape of a mapping file.
-type file struct {
+// File is the on-disk shape of a mapping file.
+type File struct {
 	Version   int              `json:"version"`
 	Locations map[string]Entry `json:"locations"`
 }
@@ -151,8 +156,8 @@ func Load() (*Mapping, error) {
 	return m, nil
 }
 
-func parse(data []byte) (*file, error) {
-	var f file
+func parse(data []byte) (*File, error) {
+	var f File
 	if err := json.Unmarshal(data, &f); err != nil {
 		return nil, err
 	}
@@ -192,7 +197,7 @@ func Skeleton(venues []string) string {
 	sorted := append([]string(nil), venues...)
 	sort.Strings(sorted)
 
-	f := file{Version: 1, Locations: map[string]Entry{}}
+	f := File{Version: 1, Locations: map[string]Entry{}}
 	for _, v := range sorted {
 		f.Locations[NormalizeKey(v)] = Entry{Source: "manual"}
 	}
