@@ -89,6 +89,42 @@ Voeg dindoa toe als input in je `flake.nix`:
 }
 ```
 
+### Agenda automatisch bijwerken (NixOS-module)
+
+De flake bevat een NixOS-module die per agenda een systemd-service en -timer aanmaakt. Zet het
+resultaat in een map die je webserver serveert, dan kun je je erop abonneren in je agenda-app.
+
+```nix
+modules = [
+  dindoa.nixosModules.default
+  {
+    services.dindoa = {
+      outputDir = "/var/www/example.org/dindoa";
+      calendars.boaz = {
+        team  = "j4";
+        email = "ouder@example.org";  # mail bij een mislukte run; weglaten = geen mail
+      };
+    };
+  }
+];
+```
+
+Dit maakt `dindoa-boaz.service` en `dindoa-boaz.timer` aan. Die schrijven
+`/var/www/example.org/dindoa/dindoa-boaz.ics` op maandag en donderdag om 06:00.
+
+| Optie                           | Standaard                    | Betekenis                                  |
+| ------------------------------- | ---------------------------- | ------------------------------------------ |
+| `calendars.<naam>.team`         | (verplicht)                  | team, zoals bij `--team`                   |
+| `calendars.<naam>.email`        | `null`                       | adres voor foutmeldingen                   |
+| `calendars.<naam>.schedule`     | `"Mon,Thu 06:00"`            | systemd `OnCalendar`                       |
+| `calendars.<naam>.fileName`     | `"dindoa-<naam>.ics"`        | bestandsnaam in `outputDir`                |
+| `outputDir`                     | `/var/lib/dindoa/calendars`  | doelmap, eigenaar `user:group`, mode 2775  |
+| `user` / `group`                | `dindoa` / `dindoa`          | waaronder de service draait                |
+| `sendmail`                      | `/run/wrappers/bin/sendmail` | voor de foutmail (bijv. postfix)           |
+
+Een run handmatig starten: `sudo systemctl start dindoa-boaz`. Wanneer de volgende run is:
+`systemctl list-timers 'dindoa-*'`.
+
 ### Home Manager
 
 Voeg dindoa toe aan je Home Manager configuratie:
