@@ -54,6 +54,12 @@
               go-tools
             ];
 
+            # Build static binaries, like the GoReleaser releases. With cgo on,
+            # `go build` here links against a glibc in the Nix store, and the
+            # binary stops starting ("no such file or directory") once a
+            # garbage collection removes that glibc.
+            CGO_ENABLED = "0";
+
             shellHook = ''
               # Drop into the user's real login shell with a marked prompt.
               # Nix sets $SHELL to bash, so without this you lose your own
