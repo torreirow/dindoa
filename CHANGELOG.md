@@ -3,7 +3,6 @@
 
 ## NEXT VERSION
 
-
 ## 0.2.0 - 12 nov 2026
 
 ### Added
@@ -24,6 +23,8 @@
 
 - **`--list-locations` markeert automatisch gevonden adressen** met `[osm-auto]`, zodat je ziet
   welke je nog moet controleren, en wijst bij ontbrekende locaties naar `--update-locations`.
+
+## 0.1.4 - 12 nov 2026
 
 ### Fixed
 
