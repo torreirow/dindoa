@@ -3,6 +3,9 @@
 
 ## NEXT VERSION
 
+
+## 0.2.0 - 12 nov 2026
+
 ### Added
 
 - **`--update-locations`**: Vult je eigen adressenlijst (`~/.config/dindoa/locations.json`) aan met
