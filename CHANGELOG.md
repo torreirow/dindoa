@@ -3,6 +3,9 @@
 
 ## NEXT VERSION
 
+
+## 0.1.4 - 12 nov 2026
+
 ### Fixed
 
 - **Aanvangstijd werd stil verkeerd gelezen**: De tijdkolom werd met `fmt.Sscanf("%d:%d")` gelezen
