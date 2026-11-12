@@ -108,6 +108,11 @@ The system SHALL provide help text explaining available flags and usage. The usa
 - **WHEN** user runs "dindoa --help"
 - **THEN** the help output describes the flag for listing locations and their mapping status
 
+#### Scenario: Update locations flag is documented
+
+- **WHEN** user runs "dindoa --help"
+- **THEN** the help output describes the flag for updating the user location mapping and states that it uses the network
+
 ### Requirement: Exit with appropriate status codes
 The system SHALL exit with appropriate status codes for success and failure cases.
 
@@ -148,3 +153,21 @@ The system SHALL provide a flag to list all venues appearing in the match progra
 - **WHEN** user runs "dindoa --list-locations" and the match programme page cannot be fetched
 - **THEN** system outputs an error indicating the page could not be fetched and exits with a non-zero status code
 
+### Requirement: Update the user location mapping
+
+The system SHALL provide a flag that fills the user location mapping file with venues from the current match programme that have no usable mapping entry yet.
+
+#### Scenario: Execute update locations command
+
+- **WHEN** user runs "dindoa --update-locations"
+- **THEN** system adds entries for missing venues to the user mapping file, reports what was added and what is still missing, and does not launch the interactive UI
+
+#### Scenario: Programme page is unavailable during update
+
+- **WHEN** user runs "dindoa --update-locations" and the match programme page cannot be fetched
+- **THEN** system outputs an error indicating the page could not be fetched, leaves the user mapping file unchanged and exits with a non-zero status code
+
+#### Scenario: Update flag combined with another command flag
+
+- **WHEN** user runs "dindoa --update-locations" together with "--team" or "--list-locations"
+- **THEN** system outputs an error that the flags cannot be combined and exits with a non-zero status code without changing the user mapping file

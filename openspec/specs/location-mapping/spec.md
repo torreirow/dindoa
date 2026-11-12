@@ -5,7 +5,7 @@ Zet de locatiestrings van dindoa.nl om naar een leesbare naam, een adres en coö
 ## Requirements
 ### Requirement: Locatie opzoeken via mappingfile
 
-Het systeem SHALL locatiegegevens uitsluitend uit een mappingfile halen en SHALL tijdens het genereren van een ICS geen netwerkverzoek doen om een locatie op te lossen.
+Het systeem SHALL locatiegegevens uitsluitend uit een mappingfile halen en SHALL tijdens het genereren van een ICS geen netwerkverzoek doen om een locatie op te lossen. Alleen het expliciete bijwerkcommando voor de gebruikersmapping gebruikt het netwerk voor locatiegegevens.
 
 #### Scenario: Bekende locatie opgezocht
 
@@ -21,6 +21,11 @@ Het systeem SHALL locatiegegevens uitsluitend uit een mappingfile halen en SHALL
 
 - **WHEN** een mappingregel een adres bevat maar geen coördinaten
 - **THEN** levert het systeem het adres en meldt het geen fout
+
+#### Scenario: Locatiestatus gebruikt geen locatiebron
+
+- **WHEN** de gebruiker de locatiestatus opvraagt
+- **THEN** raadpleegt het systeem geen externe locatiebron, alleen de mappingfiles
 
 ### Requirement: Gelaagde mapping met gebruikersoverschrijving
 
@@ -142,3 +147,7 @@ Het systeem SHALL per mappingregel een verwijzing naar de bron van de gegevens k
 - **WHEN** een mappingregel met de hand is ingevuld zonder bronverwijzing
 - **THEN** is de regel geldig en bruikbaar
 
+#### Scenario: Automatisch gevonden regel is herkenbaar
+
+- **WHEN** een mappingregel door het bijwerkcommando uit OpenStreetMap is gehaald
+- **THEN** draagt de regel de bron "osm-auto" en toont de locatiestatus die bron, zodat de gebruiker ziet welke regels nog niet handmatig gecontroleerd zijn

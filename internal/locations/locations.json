@@ -1,5 +1,45 @@
 {
   "locations": {
+    "alfa college groningen": {
+      "address": "Kardingerweg 48, 9735 AH Groningen",
+      "lat": 53.238373,
+      "lon": 6.592444,
+      "name": "Alfa-college Sportcentrum",
+      "osm": "node/2744209127",
+      "source": "web"
+    },
+    "banninghal soesterberg": {
+      "address": "Banningstraat, 3769 AA Soesterberg",
+      "lat": 52.1221545,
+      "lon": 5.2869593,
+      "name": "Banninghal",
+      "osm": "node/1544948233",
+      "source": "osm-auto"
+    },
+    "blauw withal amsterdam": {
+      "address": "Joos Banckersweg 18A, 1056 EP Amsterdam",
+      "lat": 52.375783,
+      "lon": 4.856697,
+      "name": "Blauw-Wit hal",
+      "osm": "node/2808740391",
+      "source": "web"
+    },
+    "bosbadhal emmeloord": {
+      "address": "Boslaan 28, 8302 AB Emmeloord",
+      "lat": 52.716632,
+      "lon": 5.75492,
+      "name": "Sporthal Bosbadhal",
+      "osm": "node/2719981896",
+      "source": "manual"
+    },
+    "buddingehof ruinerwold": {
+      "address": "Dijkhuizen, 7961 AH Ruinerwold",
+      "lat": 52.7229993,
+      "lon": 6.2517799,
+      "name": "Buddingehof",
+      "osm": "node/5752045433",
+      "source": "osm-auto"
+    },
     "burg bode sportpark elburg": {
       "address": "Zwolscheweg 8, 8081CG Elburg",
       "lat": 52.4454146,
@@ -16,6 +56,126 @@
       "osm": "node/4564258259",
       "source": "osm-tags"
     },
+    "cellesbroek kampen": {
+      "address": "Akelei, 8265 KA Kampen",
+      "lat": 52.549715,
+      "lon": 5.897237,
+      "name": "Sporthal Cellesbroek",
+      "osm": "node/4302354589",
+      "source": "osm-auto"
+    },
+    "de aanloop wageningen": {
+      "address": "Hooilandplein 1, 6708 RT Wageningen",
+      "lat": 51.9830603,
+      "lon": 5.6471954,
+      "name": "De Aanloop",
+      "osm": "node/3013215999",
+      "source": "osm-auto"
+    },
+    "de camp woudenberg": {
+      "address": "De Bosrand 15, 3931 AP Woudenberg",
+      "lat": 52.086807,
+      "lon": 5.410153,
+      "name": "Sporthal De Camp",
+      "osm": "node/2875781006",
+      "source": "web"
+    },
+    "de cuyl oegstgeest": {
+      "address": "de Voscuyl 36, 2341 BJ Oegstgeest",
+      "lat": 52.1839736,
+      "lon": 4.4623077,
+      "name": "De Cuyl",
+      "osm": "node/4840019917",
+      "source": "osm-auto"
+    },
+    "de eendracht nijeveen": {
+      "address": "Nieuweweg 5, 7948 AA Nijeveen",
+      "lat": 52.7312677,
+      "lon": 6.1637938,
+      "name": "De Eendracht",
+      "osm": "node/2729877933",
+      "source": "osm-auto"
+    },
+    "de horst zeewolde": {
+      "address": "Horsterweg 202 A, 3893 AA Zeewolde",
+      "lat": 52.3271725,
+      "lon": 5.5246541,
+      "name": "Sportpark De Horst",
+      "osm": "node/2848629705",
+      "source": "web"
+    },
+    "de korf leusden": {
+      "address": "De Smidse 1, 3831 NT Leusden",
+      "lat": 52.129239,
+      "lon": 5.428794,
+      "name": "Sporthal De Korf",
+      "osm": "node/1964639827",
+      "source": "osm-tags"
+    },
+    "de nieuwe bankras amstelveen": {
+      "address": "Startbaan 2, 1185 XR Amstelveen",
+      "lat": 52.285736,
+      "lon": 4.856554,
+      "name": "De Nieuwe Bankrashal",
+      "osm": "way/1452580842",
+      "source": "web"
+    },
+    "de reeve kampen": {
+      "address": "Horstsingel 1, 8261 DB Kampen",
+      "lat": 52.5526808,
+      "lon": 5.9142081,
+      "name": "De Reeve",
+      "osm": "node/2732467363",
+      "source": "manual"
+    },
+    "de slag hoevelaken": {
+      "address": "Zuiderinslag 2, 3871 MR Hoevelaken",
+      "lat": 52.1704349,
+      "lon": 5.4481021,
+      "name": "De Slag",
+      "osm": "node/2716763584",
+      "source": "osm-auto"
+    },
+    "de sypel harderwijk": {
+      "address": "Slingerbos 1, 3844 AC Harderwijk",
+      "lat": 52.3312491,
+      "lon": 5.6149899,
+      "name": "De Sypel (Het Slingerbos)",
+      "osm": "node/2854913414",
+      "source": "manual"
+    },
+    "de twine grou": {
+      "address": "Tjallinga 2, 9001 LB Grou",
+      "lat": 53.0907357,
+      "lon": 5.8256224,
+      "name": "De Twine",
+      "osm": "way/1011247258",
+      "source": "osm-auto"
+    },
+    "de viergang pijnacker": {
+      "address": "Sportlaan 1, 2641 AZ Pijnacker",
+      "lat": 52.0242999,
+      "lon": 4.4211356,
+      "name": "De Viergang",
+      "osm": "way/153209121",
+      "source": "osm-auto"
+    },
+    "de voorde voorthuizen": {
+      "address": "Harremaatweg, 3781 VV Voorthuizen",
+      "lat": 52.1866161,
+      "lon": 5.6188895,
+      "name": "De Voorde",
+      "osm": "way/266524370",
+      "source": "osm-auto"
+    },
+    "de wieken vaassen": {
+      "address": "Molenstraat 15, 8171 CE Vaassen",
+      "lat": 52.288847,
+      "lon": 5.970554,
+      "name": "Sporthal De Wieken",
+      "osm": "node/2884718365",
+      "source": "web"
+    },
     "de zanderij dindoa ermelo": {
       "address": "Watervalweg 170, 3853 PT Ermelo",
       "lat": 52.2869954,
@@ -23,6 +183,86 @@
       "name": "De Zanderij (Dindoa)",
       "osm": "way/563472182",
       "source": "manual"
+    },
+    "dijnselburg zeist": {
+      "address": "Badmeester Schenkpad 4, 3705 GK Zeist",
+      "lat": 52.105294,
+      "lon": 5.239388,
+      "name": "Sporthal Dijnselburg",
+      "osm": "node/2783588322",
+      "source": "web"
+    },
+    "dindoa hal ermelo": {
+      "address": "Watervalweg 170, 3853 PT Ermelo",
+      "lat": 52.2869954,
+      "lon": 5.5965122,
+      "name": "Dindoa-hal (De Zanderij)",
+      "osm": "way/563472182",
+      "source": "manual"
+    },
+    "dvo hal bennekom": {
+      "address": "Achterstraat 1, 6721 VM Bennekom",
+      "lat": 51.994751,
+      "lon": 5.667648,
+      "name": "DVO-hal (Sportpark De Eikelhof)",
+      "osm": "node/2760921079",
+      "source": "web"
+    },
+    "erica terpstrahal wezep": {
+      "address": "Rondweg 1, 8091 XA Wezep",
+      "lat": 52.4718774,
+      "lon": 6.0092668,
+      "name": "Erica Terpstrahal",
+      "osm": "node/2628092864",
+      "source": "osm-auto"
+    },
+    "fbk hal almere": {
+      "address": "Marathonlaan 12, 1318 EE Almere",
+      "lat": 52.389991,
+      "lon": 5.247741,
+      "name": "Sporthal Fanny Blankers-Koen",
+      "osm": "node/2840422033",
+      "source": "web"
+    },
+    "feithenhof nunspeet": {
+      "address": "Elektraweg 5, 8071 CX Nunspeet",
+      "lat": 52.3704,
+      "lon": 5.7728511,
+      "name": "Feithenhof",
+      "osm": "node/1977719071",
+      "source": "osm-auto"
+    },
+    "fit academie bokkeduinen amersfoort": {
+      "address": "Sportpark Bokkeduinen 11, 3819 BD Amersfoort",
+      "lat": 52.1573758,
+      "lon": 5.3481479,
+      "name": "Fit Academie Bokkeduinen",
+      "osm": "node/2289434749",
+      "source": "osm-auto"
+    },
+    "groen geelhal wormer": {
+      "address": "De Drie Morgen 2, 1531 SJ Wormer",
+      "lat": 52.500503,
+      "lon": 4.802551,
+      "name": "Sporthal Groen-Geel",
+      "osm": "node/2881323494",
+      "source": "manual"
+    },
+    "hanzehal zutphen": {
+      "address": "Fanny Blankers-Koenweg 4, 7203 AA Zutphen",
+      "lat": 52.1497265,
+      "lon": 6.2030137,
+      "name": "Hanzehal",
+      "osm": "way/260113147",
+      "source": "osm-auto"
+    },
+    "het ravijn nijverdal": {
+      "address": "Piet Heinweg 16, 7441 GZ Nijverdal",
+      "lat": 52.3676866,
+      "lon": 6.448532,
+      "name": "Het Ravijn",
+      "osm": "node/2845900871",
+      "source": "osm-auto"
     },
     "het slingerbos harderwijk": {
       "address": "Slingerbos 1, 3844AC Harderwijk",
@@ -32,6 +272,54 @@
       "osm": "node/2854913414",
       "source": "osm-tags"
     },
+    "hoekstra hal heerenveen": {
+      "address": "It Hege Stik 9, 8445 PZ Heerenveen",
+      "lat": 52.946919,
+      "lon": 5.929904,
+      "name": "Hoekstra hal",
+      "osm": "node/2739871433",
+      "source": "web"
+    },
+    "hoenderdaal driebergen rijsenburg": {
+      "address": "Hoendersteeg 7, 3972 NA Driebergen-Rijsenburg",
+      "lat": 52.0556909,
+      "lon": 5.263214,
+      "name": "Hoenderdaal",
+      "osm": "node/2877529598",
+      "source": "osm-auto"
+    },
+    "hoograven utrecht": {
+      "address": "Verlengde Hoogravenseweg 203, 3523 KJ Utrecht",
+      "lat": 52.06773,
+      "lon": 5.116874,
+      "name": "Sporthal Hoograven",
+      "osm": "node/3035868866",
+      "source": "web"
+    },
+    "kortezwaag gorredijk": {
+      "address": "Mientewei 2, 8401 AA Gorredijk",
+      "lat": 52.997162,
+      "lon": 6.066241,
+      "name": "Sportcentrum Kortezwaag",
+      "osm": "node/2927936569",
+      "source": "web"
+    },
+    "marsdijk assen": {
+      "address": "Kleuvenstee 3A, 9403 LT Assen",
+      "lat": 53.018044,
+      "lon": 6.586002,
+      "name": "De Marsdijkhal",
+      "osm": "node/2797629880",
+      "source": "web"
+    },
+    "meeuwen hal putten": {
+      "address": "Halvinkhuizerweg 82, 3882 LA Putten",
+      "lat": 52.2486481,
+      "lon": 5.5948724,
+      "name": "Sporthal De Meeuwen",
+      "osm": "node/2896646341",
+      "source": "manual"
+    },
     "meinga grou grou": {
       "address": "Burstumerdyk 1b, 9001ZC Grou",
       "lat": 53.0851582,
@@ -39,6 +327,62 @@
       "name": "Meinga (Grou)",
       "osm": "node/1337386567",
       "source": "osm-tags"
+    },
+    "midland amersfoort": {
+      "address": "Zangvogelweg 138, 3815 DP Amersfoort",
+      "lat": 52.162648,
+      "lon": 5.4053987,
+      "name": "Midland",
+      "osm": "node/2674427002",
+      "source": "osm-auto"
+    },
+    "oost veenendaal": {
+      "address": "Spiesheem 54, 3907 NJ Veenendaal",
+      "lat": 52.026474,
+      "lon": 5.58153,
+      "name": "Sporthal Oost",
+      "osm": "node/13819248883",
+      "source": "osm-auto"
+    },
+    "ovvo hal maarssen": {
+      "address": "Sportparkweg 9, 3604 AW Maarssen",
+      "lat": 52.124605,
+      "lon": 5.060944,
+      "name": "OVVO-hal (Sportpark Daalseweide)",
+      "osm": "node/2867058364",
+      "source": "web"
+    },
+    "skf hal veenendaal": {
+      "address": "Wageningselaan 1, 3903 LA Veenendaal",
+      "lat": 52.015841,
+      "lon": 5.565403,
+      "name": "SKF-hal",
+      "osm": "node/11357186799",
+      "source": "web"
+    },
+    "sportcentrum buiningpark leusden": {
+      "address": "Zuiderinslag, 3833 HV Leusden",
+      "lat": 52.1281731,
+      "lon": 5.4128269,
+      "name": "Sportcentrum Buiningpark",
+      "osm": "way/460824482",
+      "source": "osm-auto"
+    },
+    "sportcentrum de koploper lelystad": {
+      "address": "Badweg 21, 8224 EJ Lelystad",
+      "lat": 52.5191622,
+      "lon": 5.4948784,
+      "name": "Sportcentrum De Koploper",
+      "osm": "way/47261671",
+      "source": "osm-auto"
+    },
+    "sportcentrum de meent huizen": {
+      "address": "Graaf Wichman 177, 1276 KD Huizen",
+      "lat": 52.297619,
+      "lon": 5.244088,
+      "name": "Sportcentrum De Meent",
+      "osm": "node/2871366218",
+      "source": "web"
     },
     "sportcomplex de boskamp emmeloord": {
       "address": "Sportlaan 87D, 8302 AX Emmeloord",
@@ -56,6 +400,14 @@
       "osm": "node/2720499088",
       "source": "manual"
     },
+    "sportcomplex de wiltsangh nunspeet": {
+      "address": "Sportlaan 6, 8072 CA Nunspeet",
+      "lat": 52.384402,
+      "lon": 5.814429,
+      "name": "Sportcomplex De Wiltsangh",
+      "osm": "node/13665501494",
+      "source": "web"
+    },
     "sportcomplex sportlaan drachten": {
       "address": "Sportlaan 10, 9203 NW Drachten",
       "lat": 53.0920082,
@@ -63,6 +415,22 @@
       "name": "Sportcomplex Sportlaan",
       "osm": "node/2948624296",
       "source": "manual"
+    },
+    "sportgebouw bibian mentel amsterdam": {
+      "address": "Foekje Dillemastraat 118A, 1095 MK Amsterdam",
+      "lat": 52.372362,
+      "lon": 4.968664,
+      "name": "Sportgebouw Bibian Mentel",
+      "osm": "node/7323492423",
+      "source": "web"
+    },
+    "sporthal jan ligthartstraat kampen": {
+      "address": "Jan Ligthartstraat 1, 8265 CJ Kampen",
+      "lat": 52.551728,
+      "lon": 5.908873,
+      "name": "Sporthal Jan Ligthartstraat",
+      "osm": "node/2731677558",
+      "source": "web"
     },
     "sportpark daalseweide maarssen": {
       "address": "Sportparkweg 9, 3604 AW Maarssen",
@@ -248,6 +616,70 @@
       "osm": "node/2879980020",
       "source": "manual"
     },
+    "steinheim doorn": {
+      "address": "Wijngaardsesteeg 1a, 3941 MB Doorn",
+      "lat": 52.0268416,
+      "lon": 5.3512031,
+      "name": "Steinheim",
+      "osm": "node/2800518408",
+      "source": "osm-auto"
+    },
+    "strijland nijkerk": {
+      "address": "Nachtegaalsteeg 2, 3862 WH Nijkerk",
+      "lat": 52.2242932,
+      "lon": 5.497979,
+      "name": "Strijland",
+      "osm": "node/2719427513",
+      "source": "manual"
+    },
+    "t dok dronten": {
+      "address": "Waterfront, 8253 ZB Dronten",
+      "lat": 52.5272316,
+      "lon": 5.7125065,
+      "name": "'t Dok",
+      "osm": "way/279596851",
+      "source": "osm-auto"
+    },
+    "t gastland rhenen": {
+      "address": "Groeneweg 58, 3911 PG Rhenen",
+      "lat": 51.961947,
+      "lon": 5.566444,
+      "name": "Sport- en Recreatiecentrum 't Gastland",
+      "osm": "node/4958493913",
+      "source": "web"
+    },
+    "t huiken elburg": {
+      "address": "Lange Wijden 33, 8081 VS Elburg",
+      "lat": 52.445102,
+      "lon": 5.848319,
+      "name": "MFC 't Huiken",
+      "osm": "node/2864318513",
+      "source": "web"
+    },
+    "t kamphuis kootwijkerbroek": {
+      "address": "Kosterijweg 17, 3774 BG Kootwijkerbroek",
+      "lat": 52.152013,
+      "lon": 5.671447,
+      "name": "Sporthal Het Kamphuis",
+      "osm": "node/2732042190",
+      "source": "manual"
+    },
+    "toernooihal creil": {
+      "address": "Toernooilaan 9, 8312 AM Creil",
+      "lat": 52.763198,
+      "lon": 5.655355,
+      "name": "Sporthal De Toernooihal",
+      "osm": "node/2724021912",
+      "source": "web"
+    },
+    "topsportcentrum de koog koog aan de zaan": {
+      "address": "Wezelstraat, 1541 LZ Koog aan de Zaan",
+      "lat": 52.4677183,
+      "lon": 4.8010055,
+      "name": "Topsportcentrum De Koog",
+      "osm": "way/436516096",
+      "source": "osm-auto"
+    },
     "tussenboerslanden nijeveen nijeveen": {
       "address": "Tussenboersweg 8, 7948 LR Nijeveen",
       "lat": 52.7362799,
@@ -255,6 +687,14 @@
       "name": "Tussenboerslanden (Nijeveen)",
       "osm": "node/2729881125",
       "source": "manual"
+    },
+    "valkenhuizen arnhem": {
+      "address": "Beukenlaan, 6823 AM Arnhem",
+      "lat": 52.0060366,
+      "lon": 5.9298883,
+      "name": "Valkenhuizen",
+      "osm": "way/1088737548",
+      "source": "osm-auto"
     },
     "veld asvd dronten": {
       "address": "Educalaan 39, 8251 GC Dronten",
@@ -279,6 +719,54 @@
       "name": "Veld Wolderwijd",
       "osm": "node/2848629705",
       "source": "manual"
+    },
+    "veluwehal barneveld": {
+      "address": "Nieuwe Markt, 3771 CD Barneveld",
+      "lat": 52.1427636,
+      "lon": 5.5848795,
+      "name": "Veluwehal",
+      "osm": "node/34050125",
+      "source": "osm-auto"
+    },
+    "victorium zwolle": {
+      "address": "Hogeland 7, 8024 AZ Zwolle",
+      "lat": 52.5197837,
+      "lon": 6.1230896,
+      "name": "Victorium",
+      "osm": "node/7320074249",
+      "source": "osm-auto"
+    },
+    "watergoor nijkerk": {
+      "address": "Watergoorweg 44, 3861 MA Nijkerk",
+      "lat": 52.2269706,
+      "lon": 5.4750352,
+      "name": "Watergoor",
+      "osm": "node/2718958165",
+      "source": "manual"
+    },
+    "weteringhoek houten": {
+      "address": "Hefbrug 5, 3991 LB Houten",
+      "lat": 52.022363,
+      "lon": 5.159285,
+      "name": "Sporthal De Wetering",
+      "osm": "node/2826645098",
+      "source": "osm-tags"
+    },
+    "zbc hal zwolle": {
+      "address": "Ossenkamp 5, 8024 AG Zwolle",
+      "lat": 52.524193,
+      "lon": 6.121811,
+      "name": "ZBC-hal",
+      "osm": "node/2502506741",
+      "source": "web"
+    },
+    "zuiderpark apeldoorn": {
+      "address": "1e Wormenseweg 213, 7331 MZ Apeldoorn",
+      "lat": 52.1974214,
+      "lon": 5.9754038,
+      "name": "Zuiderpark",
+      "osm": "node/2686860595",
+      "source": "osm-auto"
     }
   },
   "version": 1
