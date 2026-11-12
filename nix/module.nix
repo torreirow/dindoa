@@ -72,6 +72,7 @@ let
   failureScript = name: cal: pkgs.writeShellScript "dindoa-${name}-failure" ''
     set -euo pipefail
     {
+      echo "From: dindoa@${config.networking.hostName}"
       echo "To: ${cal.email}"
       echo "Subject: dindoa-${name} failed on ${config.networking.hostName}"
       echo "Content-Type: text/plain; charset=UTF-8"
