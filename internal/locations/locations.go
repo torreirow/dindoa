@@ -44,8 +44,11 @@ type Entry struct {
 	// OSM references the OpenStreetMap object this entry came from, e.g.
 	// "way/563472182", so the entry can be verified later.
 	OSM string `json:"osm,omitempty"`
-	// Source records how the entry was established: "manual", "osm-tags",
-	// "osm-reverse". An empty value is allowed.
+	// Source records how the entry was established: "manual" (confirmed by
+	// hand), "osm-tags" (the OSM object carries the venue and its address),
+	// "osm-reverse", "web" (address from a club or municipal site, coordinates
+	// from OSM) or "osm-auto" (found in OSM by name only; worth verifying).
+	// An empty value is allowed.
 	Source string `json:"source,omitempty"`
 }
 
