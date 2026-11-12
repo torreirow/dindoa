@@ -3,6 +3,17 @@
 
 ## NEXT VERSION
 
+### Added
+
+- **NixOS-module** (`nixosModules.default`): genereert agenda's op een vast schema met een
+  systemd-service en -timer per agenda (`services.dindoa.calendars.<naam>`), standaard op maandag
+  en donderdag om 06:00.
+  - Het nieuwe bestand wordt atomair op zijn plek gezet; mislukt een run, dan blijft de vorige
+    agenda staan.
+  - Met `email` krijg je bij een mislukte run een mail met de laatste logregels.
+  - Heeft het team nog geen gepubliceerde wedstrijden, dan blijft de vorige agenda staan zonder
+    melding.
+
 ## 0.2.0 - 12 nov 2026
 
 ### Added

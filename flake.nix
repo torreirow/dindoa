@@ -41,6 +41,10 @@
 
       defaultPackage = forAllSystems (system: self.packages.${system}.dindoa);
 
+      # Scheduled calendar generation; see nix/module.nix.
+      nixosModules.dindoa = import ./nix/module.nix self;
+      nixosModules.default = self.nixosModules.dindoa;
+
       devShells = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
