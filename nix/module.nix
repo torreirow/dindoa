@@ -37,6 +37,15 @@ let
         default = "dindoa-${name}.ics";
         description = "File name of the calendar inside outputDir.";
       };
+
+      statusFileName = mkOption {
+        type = types.str;
+        default = "dindoa-${name}.status.json";
+        description = ''
+          File the last run time, its result and the next run are written to,
+          so a page next to the calendar can show them.
+        '';
+      };
     };
   };
 
@@ -84,6 +93,52 @@ let
     } | ${cfg.sendmail} -t
   '';
 
+  # statusScript writes the times a page can show: when the calendar was last
+  # generated, whether that run succeeded, and when the timer fires next.
+  statusScript = name: cal: pkgs.writeShellScript "dindoa-${name}-status" ''
+    set -euo pipefail
+    dir=${lib.escapeShellArg cfg.outputDir}
+    out="$dir"/${lib.escapeShellArg cal.statusFileName}
+
+    # timestamp unit property: systemd unix seconds ("@1794520130") to ISO 8601
+    # in UTC, or an empty string when the property has no value.
+    timestamp() {
+      local value
+      value=$(${pkgs.systemd}/bin/systemctl show "$1" -p "$2" --timestamp=unix)
+      value=''${value#*=}
+      value=''${value#@}
+      if [ -z "$value" ] || [ "$value" = 0 ]; then
+        printf ""
+      else
+        ${pkgs.coreutils}/bin/date -u -d "@$value" +%Y-%m-%dT%H:%M:%SZ
+      fi
+    }
+
+    last=$(timestamp "dindoa-${name}.service" ExecMainExitTimestamp)
+    result=$(${pkgs.systemd}/bin/systemctl show "dindoa-${name}.service" -p Result --value)
+    next=$(timestamp "dindoa-${name}.timer" NextElapseUSecRealtime)
+
+    # A reboot forgets the last run; keep what the previous status file says.
+    if [ -z "$last" ] && [ -r "$out" ]; then
+      last=$(${pkgs.jq}/bin/jq -r '.lastRun // empty' "$out" 2>/dev/null || true)
+      result=$(${pkgs.jq}/bin/jq -r '.lastResult // empty' "$out" 2>/dev/null || true)
+    fi
+
+    tmp=$(mktemp -p "$dir" ".dindoa-${name}-status.XXXXXX")
+    trap 'rm -f "$tmp"' EXIT
+    ${pkgs.jq}/bin/jq -n \
+      --arg team ${lib.escapeShellArg cal.team} \
+      --arg last "$last" --arg result "$result" --arg next "$next" \
+      '{
+        team: $team,
+        lastRun: (if $last == "" then null else $last end),
+        lastResult: (if $result == "" then null else $result end),
+        nextRun: (if $next == "" then null else $next end)
+      }' > "$tmp"
+    chmod 0644 "$tmp"
+    mv -f "$tmp" "$out"
+  '';
+
   forCalendars = f: lib.concatMapAttrs f cfg.calendars;
 in
 {
@@ -128,7 +183,7 @@ in
       type = types.attrsOf (types.submodule calendarModule);
       default = { };
       example = lib.literalExpression ''
-        { boaz = { team = "j4"; email = "ouder@example.org"; }; }
+        { j4 = { team = "j4"; email = "ouder@example.org"; }; }
       '';
       description = "Calendars to generate, keyed by name (used in unit and file names).";
     };
@@ -152,6 +207,7 @@ in
         wants = [ "network-online.target" ];
         after = [ "network-online.target" ];
         onFailure = lib.optional (cal.email != null) "dindoa-${name}-failure.service";
+        onSuccess = [ "dindoa-${name}-status.service" ];
         path = [ pkgs.coreutils pkgs.gnugrep ];
         environment.HOME = "/var/lib/dindoa";
         serviceConfig = {
@@ -173,6 +229,18 @@ in
           RestrictSUIDSGID = true;
           LockPersonality = true;
           RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+        };
+      };
+    } // {
+      "dindoa-${name}-status" = {
+        description = "Record when dindoa-${name} last ran and runs next";
+        # Reads unit state and writes one small file; runs as root, because a
+        # page served by the web server has to be able to read the result.
+        path = [ pkgs.coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = statusScript name cal;
+          UMask = "0022";
         };
       };
     } // lib.optionalAttrs (cal.email != null) {
@@ -198,6 +266,17 @@ in
           OnCalendar = cal.schedule;
           Persistent = true;
           RandomizedDelaySec = "10min";
+        };
+      };
+
+      # Keep the status file current even when nothing runs, e.g. after a
+      # reboot or a manual run. Cheap: one systemctl call and one write.
+      "dindoa-${name}-status" = {
+        description = "Refresh the dindoa-${name} status file";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "*:0/5";
+          OnBootSec = "1min";
         };
       };
     });

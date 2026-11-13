@@ -100,7 +100,7 @@ modules = [
   {
     services.dindoa = {
       outputDir = "/var/www/example.org/dindoa";
-      calendars.boaz = {
+      calendars.j4 = {
         team  = "j4";
         email = "ouder@example.org";  # mail bij een mislukte run; weglaten = geen mail
       };
@@ -109,8 +109,8 @@ modules = [
 ];
 ```
 
-Dit maakt `dindoa-boaz.service` en `dindoa-boaz.timer` aan. Die schrijven
-`/var/www/example.org/dindoa/dindoa-boaz.ics` op maandag en donderdag om 06:00.
+Dit maakt `dindoa-j4.service` en `dindoa-j4.timer` aan. Die schrijven
+`/var/www/example.org/dindoa/dindoa-j4.ics` op maandag en donderdag om 06:00.
 
 | Optie                           | Standaard                    | Betekenis                                  |
 | ------------------------------- | ---------------------------- | ------------------------------------------ |
@@ -122,7 +122,7 @@ Dit maakt `dindoa-boaz.service` en `dindoa-boaz.timer` aan. Die schrijven
 | `user` / `group`                | `dindoa` / `dindoa`          | waaronder de service draait                |
 | `sendmail`                      | `/run/wrappers/bin/sendmail` | voor de foutmail (bijv. postfix)           |
 
-Een run handmatig starten: `sudo systemctl start dindoa-boaz`. Wanneer de volgende run is:
+Een run handmatig starten: `sudo systemctl start dindoa-j4`. Wanneer de volgende run is:
 `systemctl list-timers 'dindoa-*'`.
 
 ### Home Manager
